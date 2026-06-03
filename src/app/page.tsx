@@ -815,7 +815,7 @@ function Contact() {
               className="rounded-full px-8 text-base"
               asChild
             >
-              <a href="mailto:hola@paulerostudio.com">
+              <a href="mailto:gpaulero@gmail.com">
                 <Mail className="mr-2 w-4 h-4" />
                 Enviar email
               </a>
