@@ -377,9 +377,47 @@ function About() {
     <AnimatedSection id="about" className="py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6">
         {/* Grid: 2 columnas en desktop (lg), 1 en mobile */}
+        {/* order-2 / order-1 invierte el orden visual en desktop: foto izquierda, texto derecha */}
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Columna izquierda: texto */}
-          <div>
+          {/* Columna izquierda: foto + cards de habilidades */}
+          <div className="space-y-8 order-2 lg:order-1">
+            {/* Tu foto con aspecto 3:4 (retrato) */}
+            <div className="relative aspect-[3/4] max-w-xs mx-auto lg:mx-0 lg:ml-auto rounded-2xl overflow-hidden border border-border/50">
+              <img
+                src="/gonzalo-photo.png"
+                alt="Gonzalo Paulero"
+                className="w-full h-full object-cover"
+              />
+              {/* Degradado sutil en la parte inferior de la foto */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
+            </div>
+            {/* Grid 2x2 de cards con habilidades */}
+            <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto lg:mx-0 lg:ml-auto">
+              {highlights.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                >
+                  <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-colors h-full">
+                    <CardContent className="p-5">
+                      {/* Renderiza el ícono dinámicamente */}
+                      <item.icon className="w-6 h-6 mb-3 text-foreground/80" />
+                      <h3 className="font-medium text-sm">{item.label}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {item.desc}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Columna derecha: texto */}
+          <div className="order-1 lg:order-2">
             <p className="text-sm font-mono text-muted-foreground mb-3">
               01 / Sobre mí
             </p>
@@ -406,43 +444,6 @@ function About() {
                 usuario. Sumado a mi formación como fotógrafo, puedo ofrecer un nivel de
                 detail visual que pocos desarrolladores pueden igualar.
               </p>
-            </div>
-          </div>
-
-          {/* Columna derecha: foto + cards de habilidades */}
-          <div className="space-y-8">
-            {/* Tu foto con aspecto 3:4 (retrato) */}
-            <div className="relative aspect-[3/4] max-w-xs mx-auto lg:mx-0 rounded-2xl overflow-hidden border border-border/50">
-              <img
-                src="/gonzalo-photo.png"
-                alt="Gonzalo Paulero"
-                className="w-full h-full object-cover"
-              />
-              {/* Degradado sutil en la parte inferior de la foto */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
-            </div>
-            {/* Grid 2x2 de cards con habilidades */}
-            <div className="grid grid-cols-2 gap-4">
-              {highlights.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                >
-                  <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-colors h-full">
-                    <CardContent className="p-5">
-                      {/* Renderiza el ícono dinámicamente */}
-                      <item.icon className="w-6 h-6 mb-3 text-foreground/80" />
-                      <h3 className="font-medium text-sm">{item.label}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {item.desc}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
             </div>
           </div>
         </div>
