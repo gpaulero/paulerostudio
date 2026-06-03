@@ -275,18 +275,6 @@ function Hero() {
 
       {/* Contenido del hero (texto, botones) */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* Badge "Disponible" con punto verde pulsante */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <div className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border text-xs text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Disponible para nuevos proyectos
-          </div>
-        </motion.div>
-
         {/* Título principal */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
