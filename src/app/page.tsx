@@ -1,7 +1,30 @@
 "use client";
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAULERO STUDIO — Portfolio Web
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//
+// ARCHIVO: src/app/page.tsx
+// Este es el archivo principal de tu sitio web.
+// En Next.js con App Router, page.tsx es lo que se muestra
+// cuando alguien visita la ruta "/" (la página de inicio).
+//
+// CONCEPTOS CLAVE:
+// - "use client" → Indica que este componente se ejecuta en el
+//   navegador del usuario (cliente), no en el servidor.
+//   Necesario para usar useState, useEffect, animaciones, etc.
+// - Componente → Una función que devuelve HTML (JSX).
+//   Cada sección (Hero, About, etc.) es un componente separado.
+// - JSX → Es como HTML pero dentro de JavaScript. Permite
+//   usar variables, condicionales y loops dentro del HTML.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// IMPORTACIONES
+// Traemos herramientas de React y librerías externas
 import { useState, useEffect, useRef } from "react";
+// framer-motion: librería para animaciones suaves
 import { motion, useInView, AnimatePresence } from "framer-motion";
+// lucide-react: librería de íconos (como FontAwesome pero moderno)
 import {
   Code2,
   ShoppingCart,
@@ -18,16 +41,29 @@ import {
   Zap,
   Monitor,
 } from "lucide-react";
+// Componentes de shadcn/ui: componentes pre-construidos con estilo consistente
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-/* ─────────── Animated Section Wrapper ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: AnimatedSection
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Es un "wrapper" (envoltorio) que agrega animación de entrada
+// a cualquier sección. Cuando la sección entra en pantalla
+// (viewport), aparece con un fade-in + deslizamiento hacia arriba.
+//
+// CÓMO FUNCIONA:
+// - useRef: crea una referencia al elemento HTML para observarlo
+// - useInView: detecta cuándo el elemento es visible en pantalla
+// - once: true → la animación ocurre solo la primera vez
+// - margin: "-80px" → dispara cuando falta 80px para ser visible
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AnimatedSection({
-  children,
-  className = "",
-  delay = 0,
+  children,       // El contenido que envuelve (cualquier HTML/componente)
+  className = "", // Clases CSS opcionales
+  delay = 0,      // Retraso en segundos antes de animar
 }: {
   children: React.ReactNode;
   className?: string;
@@ -39,8 +75,8 @@ function AnimatedSection({
   return (
     <motion.section
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 40 }}           // Estado inicial: invisible + 40px abajo
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }} // Visible o no
       transition={{ duration: 0.7, delay, ease: "easeOut" }}
       className={className}
     >
@@ -49,17 +85,34 @@ function AnimatedSection({
   );
 }
 
-/* ─────────── Navigation ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Navigation (Barra de navegación)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Barra fija arriba que cambia de estilo al hacer scroll.
+// Incluye menú hamburguesa para mobile.
+//
+// CONCEPTOS:
+// - useState: guarda estado del componente (¿scrolleó? ¿menú abierto?)
+// - useEffect: ejecuta código cuando el componente se monta
+//   (similar a DOMContentLoaded en JS vanilla)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Navigation() {
+  // Estado: ¿el usuario scrolleó más de 40px?
   const [scrolled, setScrolled] = useState(false);
+  // Estado: ¿el menú mobile está abierto?
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // useEffect: se ejecuta una vez cuando el componente carga
+  // Escucha el evento "scroll" para saber si hay que cambiar el nav
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
+    // El return limpia el listener cuando el componente se desmonta
+    // (buena práctica para evitar memory leaks)
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, []); // Array vacío = ejecutar solo una vez al montar
 
+  // Links de navegación - array de objetos
   const links = [
     { label: "Inicio", href: "#hero" },
     { label: "Sobre mí", href: "#about" },
@@ -70,9 +123,10 @@ function Navigation() {
 
   return (
     <motion.nav
-      initial={{ y: -80 }}
-      animate={{ y: 0 }}
+      initial={{ y: -80 }}   // Empieza 80px arriba (fuera de pantalla)
+      animate={{ y: 0 }}      // Se desliza a su posición
       transition={{ duration: 0.6, ease: "easeOut" }}
+      // Template literal: usa la clase con fondo si scrolleó, transparente si no
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-background/80 backdrop-blur-xl border-b border-border"
@@ -80,6 +134,7 @@ function Navigation() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Logo + nombre del estudio */}
         <a href="#hero" className="flex items-center gap-3 group">
           <img
             src="/logo-mark.png"
@@ -91,8 +146,9 @@ function Navigation() {
           </span>
         </a>
 
-        {/* Desktop */}
+        {/* Links desktop - ocultos en mobile (hidden md:flex) */}
         <div className="hidden md:flex items-center gap-8">
+          {/* .map() recorre el array y crea un <a> por cada link */}
           {links.map((link) => (
             <a
               key={link.href}
@@ -102,6 +158,7 @@ function Navigation() {
               {link.label}
             </a>
           ))}
+          {/* asChild: el Button renderiza el <a> en lugar de un <button> */}
           <Button
             variant="outline"
             size="sm"
@@ -115,16 +172,17 @@ function Navigation() {
           </Button>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Botón hamburguesa - visible solo en mobile (md:hidden) */}
         <button
           className="md:hidden text-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
+          {/* Condicional: muestra X o Menu según el estado */}
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Menú desplegable mobile con animación de entrada/salida */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -138,7 +196,7 @@ function Navigation() {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => setMobileOpen(false)} // Cierra menú al clickear
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
                 >
                   {link.label}
@@ -163,21 +221,34 @@ function Navigation() {
   );
 }
 
-/* ─────────── Hero ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Hero (Sección principal)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// La primera sección que ve el visitante. Ocupa toda la pantalla.
+// Tiene texto que rota mostrando tus roles (Desarrollador, Diseñador, etc.)
+//
+// CONCEPTOS:
+// - setInterval: cambia el rol cada 3 segundos
+// - AnimatePresence: anima la salida del texto anterior y entrada del nuevo
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Hero() {
+  // Array de roles que rotan
   const roles = [
     "Desarrollador Web",
     "Diseñador Digital",
     "Fotógrafo",
     "Creador de Experiencias",
   ];
+  // Estado: índice del rol actual que se muestra
   const [roleIndex, setRoleIndex] = useState(0);
 
+  // Cada 3 segundos, cambia al siguiente rol
+  // El % (módulo) hace que vuelva a 0 después del último
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);
     }, 3000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Limpia el intervalo
   }, [roles.length]);
 
   return (
@@ -185,23 +256,26 @@ function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background image with overlay */}
+      {/* Imagen de fondo con overlay oscuro */}
       <div className="absolute inset-0 z-0">
         <img
           src="/hero-bg.png"
           alt=""
           className="w-full h-full object-cover opacity-30"
         />
+        {/* Gradiente que oscurece la imagen para que el texto sea legible */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
       </div>
 
-      {/* Decorative grid */}
+      {/* Grilla decorativa sutil (efecto técnico) */}
       <div className="absolute inset-0 z-0 opacity-[0.03]" style={{
         backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
         backgroundSize: '60px 60px',
       }} />
 
+      {/* Contenido del hero (texto, botones) */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        {/* Badge "Disponible" con punto verde pulsante */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -213,6 +287,7 @@ function Hero() {
           </div>
         </motion.div>
 
+        {/* Título principal */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -224,15 +299,17 @@ function Hero() {
           <span className="text-muted-foreground">Studio</span>
         </motion.h1>
 
+        {/* Texto rotativo de roles */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-6 h-10 flex items-center justify-center"
         >
+          {/* AnimatePresence permite animar la salida del rol anterior */}
           <AnimatePresence mode="wait">
             <motion.span
-              key={roleIndex}
+              key={roleIndex}  // Al cambiar el key, React desmonta y remonta
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -244,6 +321,7 @@ function Hero() {
           </AnimatePresence>
         </motion.div>
 
+        {/* Párrafo descriptivo */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -255,6 +333,7 @@ function Hero() {
           listos para hacer crecer tu negocio.
         </motion.p>
 
+        {/* Botones CTA (Call To Action) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -281,6 +360,7 @@ function Hero() {
           </Button>
         </motion.div>
 
+        {/* Indicador de scroll con flecha que rebota */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -297,8 +377,15 @@ function Hero() {
   );
 }
 
-/* ─────────── About ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: About (Sobre mí)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Sección con tu foto, descripción y 4 cards de habilidades.
+// Usa grid de 2 columnas en desktop, 1 en mobile.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function About() {
+  // Datos de las 4 cards de habilidades
+  // Cada una tiene un ícono (importado de lucide-react), título y descripción
   const highlights = [
     { icon: Camera, label: "Fotógrafo", desc: "Ojo visual entrenado" },
     { icon: Palette, label: "Diseñador", desc: "Estudiante de Lic. en Diseño" },
@@ -309,7 +396,9 @@ function About() {
   return (
     <AnimatedSection id="about" className="py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6">
+        {/* Grid: 2 columnas en desktop (lg), 1 en mobile */}
         <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Columna izquierda: texto */}
           <div>
             <p className="text-sm font-mono text-muted-foreground mb-3">
               01 / Sobre mí
@@ -340,15 +429,19 @@ function About() {
             </div>
           </div>
 
+          {/* Columna derecha: foto + cards de habilidades */}
           <div className="space-y-8">
+            {/* Tu foto con aspecto 3:4 (retrato) */}
             <div className="relative aspect-[3/4] max-w-xs mx-auto lg:mx-0 rounded-2xl overflow-hidden border border-border/50">
               <img
                 src="/gonzalo-photo.png"
                 alt="Gonzalo Paulero"
                 className="w-full h-full object-cover"
               />
+              {/* Degradado sutil en la parte inferior de la foto */}
               <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
             </div>
+            {/* Grid 2x2 de cards con habilidades */}
             <div className="grid grid-cols-2 gap-4">
               {highlights.map((item, i) => (
                 <motion.div
@@ -360,6 +453,7 @@ function About() {
                 >
                   <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-colors h-full">
                     <CardContent className="p-5">
+                      {/* Renderiza el ícono dinámicamente */}
                       <item.icon className="w-6 h-6 mb-3 text-foreground/80" />
                       <h3 className="font-medium text-sm">{item.label}</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">
@@ -377,8 +471,14 @@ function About() {
   );
 }
 
-/* ─────────── Services ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Services (Servicios)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Muestra 4 servicios en cards con ícono, descripción y tags.
+// Grid de 2 columnas en desktop, 1 en mobile.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Services() {
+  // Array de servicios con todos sus datos
   const services = [
     {
       icon: Code2,
@@ -432,6 +532,7 @@ function Services() {
           </p>
         </div>
 
+        {/* Grid de 2 columnas para las cards */}
         <div className="mt-16 grid md:grid-cols-2 gap-6">
           {services.map((service, i) => (
             <motion.div
@@ -443,10 +544,12 @@ function Services() {
             >
               <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300 h-full group">
                 <CardContent className="p-8">
+                  {/* Ícono + número del servicio */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="p-3 rounded-lg bg-foreground/5">
                       <service.icon className="w-6 h-6" />
                     </div>
+                    {/* Número con ceros a la izquierda (01, 02, etc.) */}
                     <span className="text-sm font-mono text-muted-foreground">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -455,6 +558,7 @@ function Services() {
                   <p className="text-muted-foreground text-sm leading-relaxed mb-6">
                     {service.description}
                   </p>
+                  {/* Tags/badges de features */}
                   <div className="flex flex-wrap gap-2">
                     {service.features.map((feature) => (
                       <span
@@ -475,8 +579,14 @@ function Services() {
   );
 }
 
-/* ─────────── Projects ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Projects (Proyectos)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Muestra tus proyectos reales con imagen, descripción y tags.
+// Cada proyecto es una card grande con imagen a un lado y texto al otro.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Projects() {
+  // Datos de proyectos - acá agregás más cuando tengas nuevos clientes
   const projects = [
     {
       title: "Compucity",
@@ -520,6 +630,7 @@ function Projects() {
           </p>
         </div>
 
+        {/* Lista de proyectos con espacio entre cada uno */}
         <div className="mt-16 space-y-12">
           {projects.map((project, i) => (
             <motion.div
@@ -530,14 +641,16 @@ function Projects() {
               transition={{ delay: i * 0.15, duration: 0.6 }}
             >
               <Card className="bg-card/30 border-border/50 overflow-hidden group">
+                {/* Grid: imagen a la izquierda, texto a la derecha en desktop */}
                 <div className="grid lg:grid-cols-2">
-                  {/* Image */}
+                  {/* Imagen del proyecto con zoom al hover */}
                   <div className="relative overflow-hidden bg-muted/20 aspect-video lg:aspect-auto">
                     <img
                       src={project.image}
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
+                    {/* Badge de estado (Fase final / Entregado) */}
                     <div className="absolute top-4 right-4">
                       <span className="px-3 py-1 text-xs rounded-full bg-foreground/90 text-background font-medium">
                         {project.status}
@@ -545,7 +658,7 @@ function Projects() {
                     </div>
                   </div>
 
-                  {/* Content */}
+                  {/* Contenido textual del proyecto */}
                   <CardContent className="p-8 lg:p-10 flex flex-col justify-center">
                     <span className="text-sm font-mono text-muted-foreground mb-2">
                       {project.subtitle}
@@ -583,7 +696,12 @@ function Projects() {
   );
 }
 
-/* ─────────── Process ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Process (Proceso de trabajo)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Muestra los 4 pasos de cómo trabajás con clientes.
+// Grid de 4 columnas en desktop, 2 en tablet, 1 en mobile.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Process() {
   const steps = [
     {
@@ -635,6 +753,7 @@ function Process() {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="relative"
             >
+              {/* Número grande decorativo (casi invisible, es solo estético) */}
               <span className="text-5xl font-bold text-foreground/5">
                 {step.num}
               </span>
@@ -642,6 +761,7 @@ function Process() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {step.desc}
               </p>
+              {/* Flecha entre pasos (solo visible en desktop) */}
               {i < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-6 -right-4 w-8">
                   <ArrowRight className="w-4 h-4 text-foreground/10" />
@@ -655,20 +775,33 @@ function Process() {
   );
 }
 
-/* ─────────── Contact ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Contact (Formulario de contacto)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Formulario que abre el cliente de email del visitante.
+// Muestra un mensaje de éxito por 3 segundos después de enviar.
+//
+// NOTA: Actualmente usa mailto: (abre la app de email).
+// En producción se puede conectar a un servicio como Formspree,
+// Resend o un API route propio de Next.js.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Contact() {
+  // Estado del formulario: objeto con 3 campos
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     message: "",
   });
+  // Estado: ¿se envió el formulario?
   const [submitted, setSubmitted] = useState(false);
 
+  // Función que se ejecuta al enviar el formulario
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In production this would send to an API
+    e.preventDefault(); // Previene recarga de la página
+    // Crea un link mailto: con los datos del formulario
     const mailtoLink = `mailto:gonzalo@paulerostudio.com?subject=Nuevo%20proyecto%20de%20${encodeURIComponent(formState.name)}&body=${encodeURIComponent(formState.message)}%0A%0ADe:%20${encodeURIComponent(formState.email)}`;
     window.open(mailtoLink, "_blank");
+    // Muestra mensaje de éxito por 3 segundos
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
   };
@@ -680,6 +813,7 @@ function Contact() {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16">
+          {/* Columna izquierda: info de contacto */}
           <div>
             <p className="text-sm font-mono text-muted-foreground mb-3">
               05 / Contacto
@@ -706,8 +840,10 @@ function Contact() {
             </div>
           </div>
 
+          {/* Columna derecha: formulario */}
           <Card className="bg-card/50 border-border/50">
             <CardContent className="p-8">
+              {/* Condicional: muestra mensaje de éxito o el formulario */}
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -731,6 +867,7 @@ function Contact() {
                     <Input
                       placeholder="Tu nombre"
                       value={formState.name}
+                      // ...formState copia todos los campos, y solo sobreescribe "name"
                       onChange={(e) =>
                         setFormState({ ...formState, name: e.target.value })
                       }
@@ -786,7 +923,11 @@ function Contact() {
   );
 }
 
-/* ─────────── Footer ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Footer (Pie de página)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Simple: logo + copyright. Se queda abajo de todo.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Footer() {
   return (
     <footer className="border-t border-border py-12">
@@ -800,6 +941,7 @@ function Footer() {
             />
             <span className="text-sm font-medium">Paulero Studio</span>
           </div>
+          {/* Año dinámico - se actualiza solo */}
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Gonzalo Paulero. Todos los
             derechos reservados.
@@ -810,7 +952,17 @@ function Footer() {
   );
 }
 
-/* ─────────── Main Page ─────────── */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE PRINCIPAL: Home
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Este es el componente que se exporta y renderiza como página.
+// Es como el "índice" que arma toda la página juntando las secciones.
+//
+// ESTRUCTURA:
+// - div contenedor con min-h-screen (mínimo alto de pantalla)
+// - flex flex-col para que el footer se quede abajo
+// - main con flex-1 para que el contenido empuje el footer
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
