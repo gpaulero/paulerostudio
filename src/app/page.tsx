@@ -761,35 +761,19 @@ function Process() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// COMPONENTE: Contact (Formulario de contacto)
+// COMPONENTE: Contact (Contacto por WhatsApp)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Formulario que abre el cliente de email del visitante.
-// Muestra un mensaje de éxito por 3 segundos después de enviar.
-//
-// NOTA: Actualmente usa mailto: (abre la app de email).
-// En producción se puede conectar a un servicio como Formspree,
-// Resend o un API route propio de Next.js.
+// En vez de un formulario, usamos WhatsApp directo.
+// El link wa.me abre WhatsApp con un mensaje prellenado.
+// Es más directo y efectivo: el cliente escribe y listo.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Contact() {
-  // Estado del formulario: objeto con 3 campos
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  // Estado: ¿se envió el formulario?
-  const [submitted, setSubmitted] = useState(false);
-
-  // Función que se ejecuta al enviar el formulario
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Previene recarga de la página
-    // Crea un link mailto: con los datos del formulario
-    const mailtoLink = `mailto:gonzalo@paulerostudio.com?subject=Nuevo%20proyecto%20de%20${encodeURIComponent(formState.name)}&body=${encodeURIComponent(formState.message)}%0A%0ADe:%20${encodeURIComponent(formState.email)}`;
-    window.open(mailtoLink, "_blank");
-    // Muestra mensaje de éxito por 3 segundos
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-  };
+  // Número de WhatsApp con código de país (sin + ni espacios)
+  const whatsappNumber = "5493517656918";
+  // Mensaje prellenado que aparece cuando el cliente abre WhatsApp
+  const whatsappMessage = "Hola Gonzalo, me interesa saber más sobre tus servicios de desarrollo web";
+  // Link de WhatsApp: wa.me/numero?text=mensaje
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <AnimatedSection
@@ -797,111 +781,53 @@ function Contact() {
       className="py-24 sm:py-32 border-t border-border"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Columna izquierda: info de contacto */}
-          <div>
-            <p className="text-sm font-mono text-muted-foreground mb-3">
-              05 / Contacto
-            </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-              ¿Tenés un
-              <br />
-              <span className="text-muted-foreground">proyecto en mente?</span>
-            </h2>
-            <p className="mt-6 text-muted-foreground leading-relaxed">
-              Charlamos. Contame tu idea y te digo cómo puedo ayudarte.
-              Sin compromiso, sin presiones — una simple conversación para
-              ver si somos un buen match.
-            </p>
-            <div className="mt-8 space-y-4">
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <Mail className="w-4 h-4" />
-                <span className="text-sm">hola@paulerostudio.com</span>
-              </div>
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <Monitor className="w-4 h-4" />
-                <span className="text-sm">Remoto — Argentina & Latam</span>
-              </div>
-            </div>
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-sm font-mono text-muted-foreground mb-3">
+            05 / Contacto
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+            ¿Tenés un
+            <br />
+            <span className="text-muted-foreground">proyecto en mente?</span>
+          </h2>
+          <p className="mt-6 text-muted-foreground leading-relaxed">
+            Charlamos. Contame tu idea y te digo cómo puedo ayudarte.
+            Sin compromiso, sin presiones — una simple conversación para
+            ver si somos un buen match.
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              size="lg"
+              className="rounded-full px-8 text-base bg-green-600 hover:bg-green-700 text-white"
+              asChild
+            >
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                <svg className="mr-2 w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Escribime por WhatsApp
+              </a>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="rounded-full px-8 text-base"
+              asChild
+            >
+              <a href="mailto:hola@paulerostudio.com">
+                <Mail className="mr-2 w-4 h-4" />
+                Enviar email
+              </a>
+            </Button>
           </div>
 
-          {/* Columna derecha: formulario */}
-          <Card className="bg-card/50 border-border/50">
-            <CardContent className="p-8">
-              {/* Condicional: muestra mensaje de éxito o el formulario */}
-              {submitted ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center py-12 text-center"
-                >
-                  <div className="w-16 h-16 rounded-full bg-foreground/10 flex items-center justify-center mb-4">
-                    <ArrowRight className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">¡Mensaje enviado!</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Te respondo lo antes posible
-                  </p>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Nombre
-                    </label>
-                    <Input
-                      placeholder="Tu nombre"
-                      value={formState.name}
-                      // ...formState copia todos los campos, y solo sobreescribe "name"
-                      onChange={(e) =>
-                        setFormState({ ...formState, name: e.target.value })
-                      }
-                      required
-                      className="bg-background/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Email
-                    </label>
-                    <Input
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={formState.email}
-                      onChange={(e) =>
-                        setFormState({ ...formState, email: e.target.value })
-                      }
-                      required
-                      className="bg-background/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Contame sobre tu proyecto
-                    </label>
-                    <Textarea
-                      placeholder="¿Qué necesitás? ¿Para qué tipo de negocio?"
-                      value={formState.message}
-                      onChange={(e) =>
-                        setFormState({ ...formState, message: e.target.value })
-                      }
-                      required
-                      rows={5}
-                      className="bg-background/50 resize-none"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full rounded-full text-base"
-                  >
-                    Enviar mensaje
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </form>
-              )}
-            </CardContent>
-          </Card>
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <Monitor className="w-4 h-4" />
+              <span className="text-sm">Remoto — Argentina & Latam</span>
+            </div>
+          </div>
         </div>
       </div>
     </AnimatedSection>
