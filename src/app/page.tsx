@@ -360,18 +360,7 @@ function Hero() {
           </Button>
         </motion.div>
 
-        {/* Indicador de scroll con flecha que rebota */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
-          className="mt-20"
-        >
-          <a href="#about" className="inline-flex flex-col items-center text-muted-foreground hover:text-foreground transition-colors">
-            <span className="text-xs mb-2">Scroll</span>
-            <ChevronDown className="w-4 h-4 animate-bounce" />
-          </a>
-        </motion.div>
+
       </div>
     </section>
   );
