@@ -340,26 +340,35 @@ function About() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {highlights.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-              >
-                <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-colors h-full">
-                  <CardContent className="p-6">
-                    <item.icon className="w-8 h-8 mb-4 text-foreground/80" />
-                    <h3 className="font-semibold text-base">{item.label}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {item.desc}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+          <div className="flex flex-col items-center lg:items-end gap-6">
+            <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-2xl overflow-hidden border border-border/50">
+              <img
+                src="/gonzalo-photo.png"
+                alt="Gonzalo Paulero"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
+            </div>
+            <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
+              {highlights.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  className="flex items-center gap-2.5"
+                >
+                  <div className="p-1.5 rounded-md bg-foreground/5 shrink-0">
+                    <item.icon className="w-4 h-4 text-foreground/70" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium leading-tight">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
