@@ -125,6 +125,10 @@ html {
   scroll-behavior: smooth;
 }
 
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
 ::selection {
   background-color: oklch(0.97 0 0);
   color: oklch(0.08 0 0);

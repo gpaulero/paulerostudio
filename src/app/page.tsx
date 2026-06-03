@@ -64,16 +64,19 @@ function AnimatedSection({
   children,       // El contenido que envuelve (cualquier HTML/componente)
   className = "", // Clases CSS opcionales
   delay = 0,      // Retraso en segundos antes de animar
+  id,             // ID para navegación con anclas (#about, #services, etc.)
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  id?: string;
 }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
     <motion.section
+      id={id}
       ref={ref}
       initial={{ opacity: 0, y: 40 }}           // Estado inicial: invisible + 40px abajo
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }} // Visible o no
