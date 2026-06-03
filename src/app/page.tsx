@@ -217,11 +217,11 @@ function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]"
         >
-          Gonzalo
+          Paulero
           <br />
-          <span className="text-muted-foreground">Paulero</span>
+          <span className="text-muted-foreground">Studio</span>
         </motion.h1>
 
         <motion.div
@@ -250,8 +250,8 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
         >
-          Creo sitios web que combinan <strong className="text-foreground">diseño impecable</strong> con{" "}
-          <strong className="text-foreground">funcionalidad real</strong>. Rápidos, hermosos y
+          Creo sitios web que combinan <strong className="text-foreground">diseño</strong> con{" "}
+          <strong className="text-foreground">funcionalidad real</strong>. Rápidos y
           listos para hacer crecer tu negocio.
         </motion.p>
 
