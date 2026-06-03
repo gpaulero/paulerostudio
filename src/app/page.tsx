@@ -340,16 +340,16 @@ function About() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center lg:items-end gap-6">
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-2xl overflow-hidden border border-border/50">
+          <div className="space-y-8">
+            <div className="relative aspect-[3/4] max-w-xs mx-auto lg:mx-0 rounded-2xl overflow-hidden border border-border/50">
               <img
                 src="/gonzalo-photo.png"
                 alt="Gonzalo Paulero"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
             </div>
-            <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
+            <div className="grid grid-cols-2 gap-4">
               {highlights.map((item, i) => (
                 <motion.div
                   key={item.label}
@@ -357,15 +357,16 @@ function About() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="flex items-center gap-2.5"
                 >
-                  <div className="p-1.5 rounded-md bg-foreground/5 shrink-0">
-                    <item.icon className="w-4 h-4 text-foreground/70" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-tight">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
-                  </div>
+                  <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-colors h-full">
+                    <CardContent className="p-5">
+                      <item.icon className="w-6 h-6 mb-3 text-foreground/80" />
+                      <h3 className="font-medium text-sm">{item.label}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {item.desc}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               ))}
             </div>
