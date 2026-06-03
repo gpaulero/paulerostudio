@@ -574,7 +574,8 @@ function Projects() {
       subtitle: "E-commerce de tecnología",
       description:
         "Tienda online completa para una empresa de computación. Catálogo dinámico con filtros avanzados, carrito de compra, pasarelas de pago integradas y un panel de administración robusto para gestionar productos, stock y pedidos. Diseñado para escalar.",
-      image: "/project-compucity.png",
+      image: "/project-compucity-real.png",
+      url: "https://my-project-eight-liard-96.vercel.app/",
       tags: ["E-commerce", "Backend Complejo", "Panel Admin", "Pagos Online"],
       status: "Fase final",
     },
@@ -583,7 +584,8 @@ function Projects() {
       subtitle: "Registros Akáshicos & Bienestar",
       description:
         "Sitio web para un emprendimiento de registros akáshicos, con un backend potente que permite gestionar reservas de sesiones, contenido dinámico y comunicación con clientes. Una experiencia digital que refleja la esencia del servicio espiritual.",
-      image: "/project-etersomos.png",
+      image: "/project-etersomos-real.png",
+      url: "https://etersomos-iota.vercel.app/",
       tags: ["Sitio Web", "Backend Personalizado", "Reservas", "Contenido Dinámico"],
       status: "Entregado",
     },
@@ -660,10 +662,12 @@ function Projects() {
                         </span>
                       ))}
                     </div>
-                    <div>
-                      <Button variant="outline" className="rounded-full group/btn">
-                        Ver detalles
-                        <ExternalLink className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="rounded-full group/btn" asChild>
+                        <a href={project.url} target="_blank" rel="noopener noreferrer">
+                          Ver sitio
+                          <ExternalLink className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                        </a>
                       </Button>
                     </div>
                   </CardContent>
