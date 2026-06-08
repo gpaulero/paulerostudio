@@ -71,3 +71,60 @@ Stage Summary:
 - STUDIO20 discount code for tracking
 - CTA drives users to click WhatsApp button on the right
 - All changes committed and pushed, live on Vercel
+
+---
+Task ID: 9-12
+Agent: main (Super Z)
+Task: Alineacion about + chatbot como servicio + mensualidad e-commerce + selector de moneda
+
+Work Log:
+- About section: changed items-center to items-start to align text with photo top edge
+- Added "Chatbot con IA" as 5th service in services.tsx with Bot icon and features (IA conversacional, Derivacion a WhatsApp, Calificacion de leads, Respuestas 24/7)
+- Added "Chatbot con IA" card in pricing.tsx as addon "Incluido en todos los planes"
+- Added chatbot info to system prompt: plan 5 Chatbot con IA incluido sin costo extra
+- Added fallback rule for chatbot/bot/ia queries
+- E-commerce pricing: changed from "pago unico" to "pago unico + 25 USD/mes" for maintenance
+- Maintenance price: changed from 50 USD/mes to 25 USD/mes across all files
+- Maintenance card: added "Obligatorio para E-commerce, opcional para los demas planes"
+- Chatbot prompt: clarified that ONLY E-commerce has monthly fee, Landing and Completo are pago unico sin mensualidad
+- All chatbot rules updated: e-commerce shows +25 USD/mes, mantenimiento shows 25 USD/mes
+- Created /api/exchange route: fetches ARS blue from dolarapi.com + general rates from open.er-api.com, cached 1 hour
+- Added currency selector to pricing: USD, ARS, MXN, COP, CLP, BRL, UYU, PEN with real-time conversion
+- Changed from pill buttons to dropdown select for currency selector (cleaner UI)
+- Disclaimer text: "Cotizacion aproximada actualizada al [fecha]. El precio final se confirma al momento de contratar."
+- Chatbot updated: knows about currency selector, has rule for moneda/pesos/cotizacion queries
+
+Key Files:
+- src/app/api/exchange/route.ts - NEW: Exchange rate API (dolarapi + er-api, 1hr cache)
+- src/components/sections/pricing.tsx - Rewritten with currency selector + real-time conversion
+- src/components/sections/services.tsx - Added Chatbot con IA service + updated Mantenimiento
+- src/components/sections/about.tsx - items-start alignment fix
+- src/app/api/chat/route.ts - Updated all prices, e-commerce monthly, currency info, chatbot service
+
+Pricing Structure (current):
+- Landing Page: 250 USD (pago unico, sin mensualidad)
+- Sitio Web Completo: 450 USD (pago unico, sin mensualidad)
+- E-commerce: 600 USD (pago unico) + 25 USD/mes (mantenimiento tienda, obligatorio)
+- Mantenimiento & Soporte: 25 USD/mes (obligatorio e-commerce, opcional demas)
+- Chatbot con IA: Incluido en todos los planes
+- Descuento STUDIO20 (20% off): Landing=200, Completo=360, E-commerce=480
+
+Currency Selector:
+- 8 monedas: USD, ARS (blue), MXN, COP, CLP, BRL, UYU, PEN
+- Dropdown select (not pill buttons)
+- Real-time rates from dolarapi.com + open.er-api.com
+- Cached 1 hour server-side
+- Graceful degradation: falls back to USD if APIs fail
+
+Important Decisions:
+- Monthly fee ONLY for E-commerce (25 USD/mes), not for Landing or Completo
+- Currency disclaimer does NOT mention USD specifically ("El precio final se confirma al momento de contratar")
+- Dropdown selector chosen over pill buttons for cleaner UI
+- ARS uses dolar blue (not oficial) for more accurate pricing for Argentines
+
+Stage Summary:
+- About section text aligned with photo
+- Chatbot offered as service (included in all plans)
+- E-commerce monthly fee clarified across entire site
+- Currency selector with 8 Latam currencies + real-time rates
+- All changes committed and pushed, live on Vercel
