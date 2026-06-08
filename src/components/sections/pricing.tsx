@@ -189,7 +189,7 @@ function Pricing() {
         {/* Nota de cotización */}
         {mounted && selectedCurrency !== "USD" && rates && (
           <p className="mt-3 text-xs text-muted-foreground">
-            Cotización aproximada actualizada al {new Date(rates.updated).toLocaleDateString("es-AR")}. El precio final se confirma en USD al momento de contratar.
+            Cotización aproximada actualizada al {new Date(rates.updated).toLocaleDateString("es-AR")}. El precio final se confirma al momento de contratar.
           </p>
         )}
 
