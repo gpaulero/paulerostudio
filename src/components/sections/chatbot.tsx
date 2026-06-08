@@ -9,7 +9,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -18,6 +18,7 @@ interface Message {
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -31,15 +32,21 @@ function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Marcar como montado para evitar problemas de hidratación
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Tooltip después de 5 segundos
   useEffect(() => {
+    if (!mounted) return;
     const show = setTimeout(() => setShowTooltip(true), 5000);
     const hide = setTimeout(() => setShowTooltip(false), 10000);
     return () => {
       clearTimeout(show);
       clearTimeout(hide);
     };
-  }, []);
+  }, [mounted]);
 
   // Auto-scroll al último mensaje
   useEffect(() => {
@@ -113,6 +120,18 @@ function Chatbot() {
     }
   };
 
+  // No renderizar hasta que el componente esté montado en el cliente
+  // para evitar problemas con Framer Motion SSR
+  if (!mounted) {
+    return (
+      <div className="fixed bottom-6 left-6 z-40">
+        <div className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg bg-primary text-primary-foreground">
+          <MessageCircle className="w-6 h-6" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed bottom-6 left-6 z-40">
       {/* Tooltip */}
@@ -144,8 +163,8 @@ function Chatbot() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-background" />
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold leading-tight">
@@ -179,20 +198,20 @@ function Chatbot() {
                     className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                       msg.role === "user"
                         ? "bg-foreground/10"
-                        : "bg-foreground"
+                        : "bg-primary"
                     }`}
                   >
                     {msg.role === "user" ? (
                       <User className="w-3.5 h-3.5" />
                     ) : (
-                      <Bot className="w-3.5 h-3.5 text-background" />
+                      <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                     )}
                   </div>
                   {/* Bubble */}
                   <div
                     className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
                       msg.role === "user"
-                        ? "bg-foreground text-background rounded-br-md"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
                         : "bg-foreground/10 rounded-bl-md"
                     }`}
                   >
@@ -204,8 +223,8 @@ function Chatbot() {
               {/* Indicador de escritura */}
               {isLoading && (
                 <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center shrink-0">
-                    <Bot className="w-3.5 h-3.5 text-background" />
+                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <Bot className="w-3.5 h-3.5 text-primary-foreground" />
                   </div>
                   <div className="bg-foreground/10 px-4 py-3 rounded-2xl rounded-bl-md">
                     <div className="flex items-center gap-1.5">
@@ -236,7 +255,7 @@ function Chatbot() {
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  className="p-2.5 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-2.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Enviar mensaje"
                 >
                   <Send className="w-4 h-4" />
@@ -247,40 +266,19 @@ function Chatbot() {
         )}
       </AnimatePresence>
 
-      {/* Botón flotante */}
+      {/* Botón flotante — sin AnimatePresence en el ícono para evitar
+          que se oculte antes de la hidratación */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileTap={{ scale: 0.95 }}
-        className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-105 ${
-          isOpen
-            ? "bg-foreground text-background"
-            : "bg-foreground text-background shadow-foreground/20 hover:shadow-xl hover:shadow-foreground/30"
-        }`}
+        className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-colors duration-200 hover:scale-105 bg-primary text-primary-foreground shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
         aria-label={isOpen ? "Cerrar chat" : "Abrir chat"}
       >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              <X className="w-6 h-6" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="open"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              <MessageCircle className="w-6 h-6" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <MessageCircle className="w-6 h-6" />
+        )}
       </motion.button>
     </div>
   );
