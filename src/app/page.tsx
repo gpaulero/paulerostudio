@@ -727,7 +727,8 @@ function Projects() {
                 {/* Grid: imagen a la izquierda, texto a la derecha en desktop */}
                 <div className="grid lg:grid-cols-2">
                   {/* Imagen del proyecto con zoom al hover */}
-                  <div className="relative overflow-hidden bg-muted/20 aspect-video lg:aspect-auto">
+                  {/* aspect-[16/10] siempre — evita que la imagen se "zoomée" en desktop */}
+                  <div className="relative overflow-hidden bg-muted/20 aspect-[16/10]">
                     <img
                       src={project.image}
                       alt={project.title}
