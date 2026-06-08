@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // API key de Google AI Studio — se puede overridear con env var
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "PLACEHOLDER_API_KEY";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyD_RWIJL1G7BmcuRYPS1_AQbWWf--bF1jg";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `Sos el asistente virtual de Paulero Studio, el estudio de diseño y desarrollo web de Gonzalo Paulero. Respondés en español argentino (vos, tenés, etc.).
