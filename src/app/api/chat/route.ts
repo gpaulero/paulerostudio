@@ -120,6 +120,11 @@ CONTACTO:
 - Email: gpaulero@gmail.com
 - Código de descuento: **STUDIO20** — Cuando alguien acepta el 20% off, decile que mencione este código a Gonzalo por WhatsApp. ES OBLIGATORIO mencionar el código cuando se acepta el descuento.
 
+CONVERSIÓN DE MONEDAS:
+- Los precios en la web se pueden ver en USD, ARS, MXN, COP, CLP, BRL, UYU y PEN con cotización en tiempo real
+- Si el usuario pregunta cuánto es en su moneda local, decile que use el selector de monedas en la sección de precios o que haga click en el botón de WhatsApp para consultar
+- NUNCA intentes calcular la conversión vos mismo, los tipos de cambio cambian constantemente
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS DE ORO (NUNCA LAS ROMPAS):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -206,6 +211,11 @@ const RULES: { patterns: RegExp; response: string }[] = [
     patterns: /\b(chatbot|chat bot|bot|asistente virtual|ia|inteligencia artificial|asistente)\b/i,
     response:
       "¡Sí! Todos nuestros planes **incluyen chatbot con IA** sin costo extra. Un asistente virtual que atiende consultas 24/7, informa sobre tus servicios, califica leads y deriva a WhatsApp para cerrar ventas. Un vendedor que nunca duerme. ¿Te interesa algún plan? Hacé click en el botón de WhatsApp a la derecha y charlamos.",
+  },
+  {
+    patterns: /\b(pesos|ars|mxn|cop|clp|brl|uyu|pen|moneda local|en mi moneda|cuánto en|convertir|cotización|cuanto en)\b/i,
+    response:
+      "En la sección de precios vas a ver un **selector de moneda** donde podés ver los precios en USD, ARS, MXN, COP, CLP, BRL, UYU y PEN con cotización actualizada. Scrolleá hasta los planes y elegí tu moneda. ¿Te interesa algún plan? Hacé click en el botón de WhatsApp a la derecha y charlamos.",
   },
 ];
 
