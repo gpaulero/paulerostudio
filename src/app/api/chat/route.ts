@@ -96,6 +96,13 @@ PLANES Y PRECIOS:
 4. Mantenimiento & Soporte — 50 USD/mes
    - Actualizaciones, backups, monitoreo, seguridad y soporte técnico
 
+5. Chatbot con IA — INCLUIDO en todos los planes (sin costo extra)
+   - Asistente virtual que atiende consultas 24/7
+   - Informa sobre tus servicios y precios automáticamente
+   - Califica leads y deriva a WhatsApp para cerrar ventas
+   - Un vendedor que nunca duerme, integrado a tu web
+   - Personalizado con la info de tu negocio
+
 TECNOLOGÍAS (hablá con confianza sobre esto):
 - Frontend: Next.js, React, TypeScript, Tailwind CSS, Framer Motion
 - Backend: Node.js, Prisma, PostgreSQL
@@ -191,6 +198,11 @@ const RULES: { patterns: RegExp; response: string }[] = [
     patterns: /\b(gracias|genial|perfecto|excelente|ok|dale|barbaro|me interesa|quiero|armemos|hagamos)\b/i,
     response:
       "¡Dale! No pierdas más tiempo. Hacé click en el botón de WhatsApp a la derecha y hoy mismo empezamos a armar tu proyecto. Tu web profesional está más cerca de lo que pensás.",
+  },
+  {
+    patterns: /\b(chatbot|chat bot|bot|asistente virtual|ia|inteligencia artificial|asistente)\b/i,
+    response:
+      "¡Sí! Todos nuestros planes **incluyen chatbot con IA** sin costo extra. Un asistente virtual que atiende consultas 24/7, informa sobre tus servicios, califica leads y deriva a WhatsApp para cerrar ventas. Un vendedor que nunca duerme. ¿Te interesa algún plan? Hacé click en el botón de WhatsApp a la derecha y charlamos.",
   },
 ];
 

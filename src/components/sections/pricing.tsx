@@ -11,7 +11,7 @@
 // se define según la complejidad de cada proyecto.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Shield } from "lucide-react";
+import { ArrowRight, Check, Shield, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedSection from "./animated-section";
@@ -185,6 +185,41 @@ function Pricing() {
               </div>
               <div className="shrink-0 text-right">
                 <span className="text-2xl font-bold">{maintenancePrice}</span>
+                <Button
+                  variant="outline"
+                  className="rounded-full ml-4"
+                  asChild
+                >
+                  <a href="#contact">Consultar</a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Card de chatbot con IA — addon para cualquier plan */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="mt-4"
+        >
+          <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
+            <CardContent className="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
+                  <Bot className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Chatbot con IA</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Un asistente virtual que atiende consultas 24/7, informa sobre tus servicios, califica leads y deriva a WhatsApp para cerrar ventas. Se suma a cualquier plan.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0 text-right">
+                <span className="text-sm text-muted-foreground">Incluido en todos los planes</span>
                 <Button
                   variant="outline"
                   className="rounded-full ml-4"

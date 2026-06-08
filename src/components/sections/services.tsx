@@ -7,7 +7,7 @@
 // Grid de 2 columnas en desktop, 1 en mobile.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import { motion } from "framer-motion";
-import { Code2, ShoppingCart, Server, Settings } from "lucide-react";
+import { Code2, ShoppingCart, Server, Settings, Bot } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedSection from "./animated-section";
 
@@ -41,6 +41,13 @@ function Services() {
       description:
         "Tu sitio web necesita cuidado constante. Ofrezco planes de mantenimiento mensual que incluyen actualizaciones, monitoreo de rendimiento, backups, seguridad y soporte técnico. Para que vos te enfoques en tu negocio.",
       features: ["Actualizaciones", "Backups automáticos", "Monitoreo 24/7", "Soporte prioritario"],
+    },
+    {
+      icon: Bot,
+      title: "Chatbot con IA",
+      description:
+        "Agregá un asistente virtual a tu web que atiende consultas 24/7, responde sobre tus servicios, califica leads y deriva a WhatsApp para cerrar ventas. Un vendedor que nunca duerme, integrado a tu sitio.",
+      features: ["IA conversacional", "Derivación a WhatsApp", "Calificación de leads", "Respuestas 24/7"],
     },
   ];
 

@@ -26,7 +26,7 @@ function About() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Grid: 2 columnas en desktop (lg), 1 en mobile */}
         {/* order-2 / order-1 invierte el orden visual en desktop: foto izquierda, texto derecha */}
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Columna izquierda: foto + cards de habilidades */}
           <div className="space-y-8 order-2 lg:order-1">
             {/* Tu foto con aspecto 3:4 (retrato) */}
