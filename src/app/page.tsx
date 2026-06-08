@@ -40,6 +40,15 @@ import {
   Palette,
   Zap,
   Monitor,
+  Check,
+  MessageCircle,
+  Clock,
+  Shield,
+  Database,
+  Globe,
+  Cpu,
+  Layers,
+  ChevronUp,
 } from "lucide-react";
 // Componentes de shadcn/ui: componentes pre-construidos con estilo consistente
 import { Button } from "@/components/ui/button";
@@ -121,6 +130,8 @@ function Navigation() {
     { label: "Sobre mí", href: "#about" },
     { label: "Servicios", href: "#services" },
     { label: "Proyectos", href: "#projects" },
+    { label: "Planes", href: "#pricing" },
+    { label: "FAQ", href: "#faq" },
     { label: "Contacto", href: "#contact" },
   ];
 
@@ -150,7 +161,7 @@ function Navigation() {
         </a>
 
         {/* Links desktop - ocultos en mobile (hidden md:flex) */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6">
           {/* .map() recorre el array y crea un <a> por cada link */}
           {links.map((link) => (
             <a
@@ -175,9 +186,9 @@ function Navigation() {
           </Button>
         </div>
 
-        {/* Botón hamburguesa - visible solo en mobile (md:hidden) */}
+        {/* Botón hamburguesa - visible solo en mobile (lg:hidden) */}
         <button
-          className="md:hidden text-foreground"
+          className="lg:hidden text-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {/* Condicional: muestra X o Menu según el estado */}
@@ -192,7 +203,7 @@ function Navigation() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border overflow-hidden"
+            className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border overflow-hidden"
           >
             <div className="px-6 py-4 flex flex-col gap-4">
               {links.map((link) => (
@@ -342,8 +353,6 @@ function Hero() {
             <a href="#projects">Ver trabajos</a>
           </Button>
         </motion.div>
-
-
       </div>
     </section>
   );
@@ -438,6 +447,91 @@ function About() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: TechStack (Stack tecnológico)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Muestra las tecnologías que usás, agrupadas por categoría.
+// Los mejores portfolios siempre muestran su stack para que
+// el cliente sepa CON QUÉ trabajás. Esto también ayuda con SEO
+// porque Google indexa los nombres de tecnologías.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function TechStack() {
+  // Tecnologías agrupadas por categoría
+  const categories = [
+    {
+      name: "Frontend",
+      icon: Layers,
+      techs: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    },
+    {
+      name: "Backend",
+      icon: Server,
+      techs: ["Node.js", "Prisma", "PostgreSQL", "REST APIs", "Auth"],
+    },
+    {
+      name: "Herramientas",
+      icon: Settings,
+      techs: ["Vercel", "Git", "Figma", "VSC", "Linux"],
+    },
+  ];
+
+  return (
+    <AnimatedSection className="py-24 sm:py-32 border-t border-border">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-2xl">
+          <p className="text-sm font-mono text-muted-foreground mb-3">
+            Stack / Tecnologías
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+            Lo que uso
+            <br />
+            <span className="text-muted-foreground">para construir</span>
+          </h2>
+          <p className="mt-6 text-muted-foreground leading-relaxed">
+            Trabajo con tecnologías modernas y probadas. Cada herramienta
+            se elige pensando en rendimiento, escalabilidad y mantenibilidad
+            a largo plazo.
+          </p>
+        </div>
+
+        <div className="mt-16 grid sm:grid-cols-3 gap-8">
+          {categories.map((cat, i) => (
+            <motion.div
+              key={cat.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300 h-full">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-lg bg-foreground/5">
+                      <cat.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-semibold text-lg">{cat.name}</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {cat.techs.map((tech) => (
+                      <div
+                        key={tech}
+                        className="flex items-center gap-3 text-sm text-muted-foreground"
+                      >
+                        <Check className="w-3.5 h-3.5 text-foreground/60 shrink-0" />
+                        <span>{tech}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </div>
     </AnimatedSection>
@@ -555,11 +649,13 @@ function Services() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPONENTE: Projects (Proyectos)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Muestra tus proyectos reales con imagen, descripción y tags.
-// Cada proyecto es una card grande con imagen a un lado y texto al otro.
+// Muestra tus proyectos reales con imagen, descripción, stack
+// tecnológico y métricas de resultado. Cada proyecto incluye
+// la tecnología usada y el impacto que tuvo en el negocio.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Projects() {
   // Datos de proyectos - acá agregás más cuando tengas nuevos clientes
+  // INCLUYE: tech (stack tecnológico) y metrics (resultados concretos)
   const projects = [
     {
       title: "Compucity",
@@ -569,6 +665,12 @@ function Projects() {
       image: "/project-compucity-real.png",
       url: "https://my-project-eight-liard-96.vercel.app/",
       tags: ["E-commerce", "Backend Complejo", "Panel Admin", "Pagos Online"],
+      tech: ["Next.js", "React", "Prisma", "PostgreSQL", "Tailwind CSS"],
+      metrics: [
+        { label: "Productos gestionados", value: "500+" },
+        { label: "Categorías con filtros", value: "15+" },
+        { label: "Carga inicial", value: "< 2s" },
+      ],
       status: "Fase final",
     },
     {
@@ -579,6 +681,12 @@ function Projects() {
       image: "/project-etersomos-real.png",
       url: "https://etersomos-iota.vercel.app/",
       tags: ["Sitio Web", "Backend Personalizado", "Reservas", "Contenido Dinámico"],
+      tech: ["Next.js", "React", "Prisma", "PostgreSQL", "Tailwind CSS"],
+      metrics: [
+        { label: "Sistema de reservas", value: "Online" },
+        { label: "Contenido dinámico", value: "CMS propio" },
+        { label: "Carga inicial", value: "< 1.5s" },
+      ],
       status: "Entregado",
     },
   ];
@@ -644,6 +752,33 @@ function Projects() {
                     <p className="text-muted-foreground leading-relaxed mb-6">
                       {project.description}
                     </p>
+
+                    {/* Métricas de resultado — CUÁNTO IMPACTÓ el proyecto */}
+                    <div className="grid grid-cols-3 gap-4 mb-6 p-4 rounded-lg bg-foreground/5 border border-border/50">
+                      {project.metrics.map((metric) => (
+                        <div key={metric.label} className="text-center">
+                          <div className="text-lg font-bold text-foreground">{metric.value}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{metric.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Stack tecnológico del proyecto */}
+                    <div className="mb-6">
+                      <p className="text-xs font-mono text-muted-foreground mb-2">Stack:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {project.tech.map((t) => (
+                          <span
+                            key={t}
+                            className="px-2.5 py-1 text-xs rounded-md bg-foreground/10 text-foreground/80 font-medium"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tags tradicionales del proyecto */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {project.tags.map((tag) => (
                         <span
@@ -668,6 +803,201 @@ function Projects() {
             </motion.div>
           ))}
         </div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: Pricing (Planes y precios)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Muestra rangos de precios para que el cliente sepa si está
+// dentro de su presupuesto ANTES de escribirte. Esto filtra
+// consultas que no van a llegar a nada y ahorra tiempo a todos.
+//
+// NOTA: Los precios son orientativos ("desde"). El precio final
+// se define según la complejidad de cada proyecto.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function Pricing() {
+  const plans = [
+    {
+      name: "Landing Page",
+      price: "250 USD",
+      period: "pago único",
+      description: "Ideal para emprendedores que necesitan presencia online rápida y profesional.",
+      features: [
+        "Diseño a medida (no templates)",
+        "Hasta 5 secciones",
+        "100% responsive (mobile + desktop)",
+        "SEO básico optimizado",
+        "Formulario de contacto / WhatsApp",
+        "Deploy en producción incluido",
+        "1 semana de entrega",
+      ],
+      highlight: false,
+    },
+    {
+      name: "Sitio Web Completo",
+      price: "600 USD",
+      period: "pago único",
+      description: "Para negocios que necesitan más que una vitrina: funcionalidades reales y backend robusto.",
+      features: [
+        "Todo lo de Landing Page",
+        "Secciones ilimitadas",
+        "Backend con base de datos",
+        "Panel de administración",
+        "Contenido dinámico (CMS)",
+        "Integración con APIs",
+        "2-4 semanas de entrega",
+      ],
+      highlight: true,
+    },
+    {
+      name: "E-commerce",
+      price: "1.000 USD",
+      period: "pago único",
+      description: "Tienda online completa para vender 24/7 con pasarelas de pago y gestión de stock.",
+      features: [
+        "Todo lo de Sitio Web Completo",
+        "Catálogo de productos con filtros",
+        "Carrito de compra",
+        "Pasarelas de pago (MercadoPago, etc.)",
+        "Gestión de stock y pedidos",
+        "Panel admin para productos",
+        "4-6 semanas de entrega",
+      ],
+      highlight: false,
+    },
+  ];
+
+  // Precio del plan de mantenimiento mensual
+  const maintenancePrice = "50 USD/mes";
+
+  return (
+    <AnimatedSection
+      id="pricing"
+      className="py-24 sm:py-32 border-t border-border"
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-2xl">
+          <p className="text-sm font-mono text-muted-foreground mb-3">
+            Planes / Precios
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+            Inversión
+            <br />
+            <span className="text-muted-foreground">transparente</span>
+          </h2>
+          <p className="mt-6 text-muted-foreground leading-relaxed">
+            Precios orientativos. Cada proyecto es único, así que el precio
+            final se ajusta según tus necesidades. Sin sorpresas ni costos
+            ocultos — sabés exactamente qué estás pagando antes de empezar.
+          </p>
+        </div>
+
+        {/* Grid de 3 columnas para los planes */}
+        <div className="mt-16 grid md:grid-cols-3 gap-6">
+          {plans.map((plan, i) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <Card className={`h-full transition-all duration-300 ${
+                plan.highlight
+                  ? "bg-card border-foreground/30 shadow-lg shadow-foreground/5"
+                  : "bg-card/50 border-border/50 hover:border-foreground/20"
+              }`}>
+                <CardContent className="p-8 flex flex-col h-full">
+                  {/* Badge "Popular" en el plan destacado */}
+                  {plan.highlight && (
+                    <span className="self-start px-3 py-1 text-xs rounded-full bg-foreground text-background font-medium mb-4">
+                      Más elegido
+                    </span>
+                  )}
+
+                  <h3 className="text-xl font-semibold">{plan.name}</h3>
+                  <p className="text-sm text-muted-foreground mt-2 mb-6">
+                    {plan.description}
+                  </p>
+
+                  {/* Precio */}
+                  <div className="mb-6">
+                    <span className="text-3xl font-bold">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
+                  </div>
+
+                  {/* Lista de features con checks */}
+                  <div className="space-y-3 flex-1 mb-8">
+                    {plan.features.map((feature) => (
+                      <div
+                        key={feature}
+                        className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                      >
+                        <Check className="w-4 h-4 text-foreground/70 shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Botón CTA del plan */}
+                  <Button
+                    className={`rounded-full w-full ${
+                      plan.highlight
+                        ? ""
+                        : "bg-foreground/10 text-foreground hover:bg-foreground/20"
+                    }`}
+                    variant={plan.highlight ? "default" : "outline"}
+                    asChild
+                  >
+                    <a href="#contact">
+                      Consultar
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Card de mantenimiento — separada porque es mensual */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-8"
+        >
+          <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
+            <CardContent className="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Mantenimiento & Soporte</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Actualizaciones, backups, monitoreo de rendimiento, seguridad y soporte técnico.
+                    Para que tu sitio siga funcionando perfecto mientras vos te enfocás en tu negocio.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0 text-right">
+                <span className="text-2xl font-bold">{maintenancePrice}</span>
+                <Button
+                  variant="outline"
+                  className="rounded-full ml-4"
+                  asChild
+                >
+                  <a href="#contact">Consultar</a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </AnimatedSection>
   );
@@ -753,6 +1083,112 @@ function Process() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: FAQ (Preguntas Frecuentes)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Sección de preguntas frecuentes que responde las dudas más
+// comunes ANTES de que el cliente te escriba. Esto genera
+// confianza y reduce fricción en la conversión.
+//
+// Usa un accordion simple con useState para abrir/cerrar.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function FAQ() {
+  // Estado: índice de la pregunta abierta (null = ninguna)
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const faqs = [
+    {
+      question: "¿Cuánto tarda un proyecto?",
+      answer: "Depende de la complejidad. Una landing page puede estar lista en 1 semana, un sitio completo en 2-4 semanas, y un e-commerce en 4-6 semanas. En la primera charla te doy un estimado preciso según tu caso.",
+    },
+    {
+      question: "¿Trabajás con clientes de todo el país?",
+      answer: "Sí, trabajo de forma remota con clientes de toda Argentina y Latinoamérica. Las reuniones son por videollamada y el seguimiento es constante, así que la distancia no es un problema.",
+    },
+    {
+      question: "¿Qué pasa después de que se lanza el sitio?",
+      answer: "Ofrezco planes de mantenimiento mensual que incluyen actualizaciones, backups, monitoreo de seguridad y soporte técnico. También podés contactarme por cualquier consulta puntual, siempre estoy disponible.",
+    },
+    {
+      question: "¿Usás templates o WordPress?",
+      answer: "No. Todos mis proyectos se construyen desde cero con Next.js y React. Esto significa que tu sitio va a ser único, más rápido y más seguro que uno hecho con templates o WordPress genérico.",
+    },
+    {
+      question: "¿Cómo es el proceso de pago?",
+      answer: "Generalmente trabajo con un 50% al inicio y 50% al entregar. Para proyectos grandes, podemos armar un calendario de pagos por etapas. Acepto transferencia bancaria y MercadoPago.",
+    },
+    {
+      question: "¿Podéo actualizar el contenido yo mismo?",
+      answer: "Sí. Los sitios que desarrollo incluyen un panel de administración donde podés modificar textos, imágenes, productos y más sin necesidad de saber programar. Si necesitás algo más complejo, yo me encargo.",
+    },
+  ];
+
+  return (
+    <AnimatedSection
+      id="faq"
+      className="py-24 sm:py-32 border-t border-border"
+    >
+      <div className="max-w-3xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <p className="text-sm font-mono text-muted-foreground mb-3">
+            05 / FAQ
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+            Preguntas
+            <br />
+            <span className="text-muted-foreground">frecuentes</span>
+          </h2>
+        </div>
+
+        <div className="space-y-3">
+          {faqs.map((faq, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05, duration: 0.4 }}
+            >
+              <div
+                className="border border-border/50 rounded-lg overflow-hidden transition-colors hover:border-foreground/20"
+              >
+                {/* Pregunta — clickable para abrir/cerrar */}
+                <button
+                  className="w-full flex items-center justify-between p-5 text-left"
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                >
+                  <span className="font-medium text-sm sm:text-base pr-4">{faq.question}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                      openIndex === i ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {/* Respuesta — se muestra/oculta con animación */}
+                <AnimatePresence>
+                  {openIndex === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPONENTE: Contact (Contacto por WhatsApp)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // En vez de un formulario, usamos WhatsApp directo.
@@ -775,7 +1211,7 @@ function Contact() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-sm font-mono text-muted-foreground mb-3">
-            05 / Contacto
+            06 / Contacto
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
             ¿Tenés un
@@ -827,6 +1263,94 @@ function Contact() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COMPONENTE: WhatsAppFloatingButton
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Botón flotante de WhatsApp que aparece en la esquina inferior
+// derecha. Siempre visible para que el cliente pueda escribirte
+// en cualquier momento, sin tener que scrollear hasta Contacto.
+//
+// Se oculta cuando el usuario está en la sección de Contacto
+// para no duplicar el botón.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function WhatsAppFloatingButton() {
+  const whatsappNumber = "5493517656918";
+  const whatsappMessage = "Hola Gonzalo, vi tu portfolio y me interesa saber más";
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
+  // Estado: ¿mostrar el botón? (se oculta si estamos cerca de Contacto)
+  const [visible, setVisible] = useState(true);
+  // Estado: ¿mostrar tooltip? (aparece después de 3 segundos)
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    // Mostrar tooltip después de 3 segundos
+    const tooltipTimer = setTimeout(() => setShowTooltip(true), 3000);
+    // Ocultar tooltip después de 8 segundos
+    const hideTooltip = setTimeout(() => setShowTooltip(false), 8000);
+
+    // Ocultar botón cuando el usuario scrollea cerca de la sección Contacto
+    const onScroll = () => {
+      const contactSection = document.getElementById("contact");
+      if (contactSection) {
+        const rect = contactSection.getBoundingClientRect();
+        // Si la sección de contacto está visible en pantalla, ocultar botón
+        setVisible(rect.top > window.innerHeight || rect.bottom < 0);
+      }
+    };
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      clearTimeout(tooltipTimer);
+      clearTimeout(hideTooltip);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ delay: 1.5, duration: 0.3 }}
+          className="fixed bottom-6 right-6 z-40"
+        >
+          {/* Tooltip que aparece brevemente */}
+          <AnimatePresence>
+            {showTooltip && (
+              <motion.div
+                initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                className="absolute bottom-full right-0 mb-3 bg-foreground text-background text-xs px-3 py-2 rounded-lg whitespace-nowrap shadow-lg"
+              >
+                ¿Tenés un proyecto? Escribime
+                {/* Flechita del tooltip */}
+                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-foreground" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Botón circular de WhatsApp */}
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-green-600/30"
+            aria-label="Contactar por WhatsApp"
+          >
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </a>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPONENTE: Footer (Pie de página)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Simple: logo + copyright. Se queda abajo de todo.
@@ -873,12 +1397,16 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <About />
+        <TechStack />
         <Services />
         <Projects />
+        <Pricing />
         <Process />
+        <FAQ />
         <Contact />
       </main>
       <Footer />
+      <WhatsAppFloatingButton />
     </div>
   );
 }
