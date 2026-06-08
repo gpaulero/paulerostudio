@@ -39,8 +39,8 @@ function Services() {
       icon: Settings,
       title: "Mantenimiento & Soporte",
       description:
-        "Tu sitio web necesita cuidado constante. Ofrezco planes de mantenimiento mensual que incluyen actualizaciones, monitoreo de rendimiento, backups, seguridad y soporte técnico. Para que vos te enfoques en tu negocio.",
-      features: ["Actualizaciones", "Backups automáticos", "Monitoreo 24/7", "Soporte prioritario"],
+        "Tu sitio web necesita cuidado constante. Ofrezco planes de mantenimiento mensual que incluyen actualizaciones, monitoreo de rendimiento, backups, seguridad y soporte técnico. Obligatorio para E-commerce, opcional para los demás planes.",
+      features: ["Actualizaciones", "Backups automáticos", "Monitoreo 24/7", "Soporte prioritario", "25 USD/mes"],
     },
     {
       icon: Bot,

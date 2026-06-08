@@ -53,7 +53,7 @@ function Pricing() {
     {
       name: "E-commerce",
       price: "600 USD",
-      period: "pago único",
+      period: "pago único + 25 USD/mes",
       description: "Tienda online completa para vender 24/7 con pasarelas de pago y gestión de stock.",
       features: [
         "Todo lo de Sitio Web Completo",
@@ -62,6 +62,7 @@ function Pricing() {
         "Pasarelas de pago (MercadoPago, etc.)",
         "Gestión de stock y pedidos",
         "Panel admin para productos",
+        "Mantenimiento de tienda incluido (25 USD/mes)",
         "4-6 semanas de entrega",
       ],
       highlight: false,
@@ -69,7 +70,7 @@ function Pricing() {
   ];
 
   // Precio del plan de mantenimiento mensual
-  const maintenancePrice = "50 USD/mes";
+  const maintenancePrice = "25 USD/mes";
 
   return (
     <AnimatedSection
@@ -179,7 +180,7 @@ function Pricing() {
                   <h3 className="text-xl font-semibold">Mantenimiento & Soporte</h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     Actualizaciones, backups, monitoreo de rendimiento, seguridad y soporte técnico.
-                    Para que tu sitio siga funcionando perfecto mientras vos te enfocás en tu negocio.
+                    Obligatorio para E-commerce, opcional para los demás planes. Para que tu sitio siga funcionando perfecto mientras vos te enfocás en tu negocio.
                   </p>
                 </div>
               </div>

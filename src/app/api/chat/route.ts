@@ -26,7 +26,8 @@ PASO 3 — MOSTRAR VALOR: Antes de precio, mostrá lo que GANA. Más clientes, m
 PASO 4 — MANEJAR OBJECIONES POR PRECIO (FLUJO DE 3 NIVELES, NUNCA TE SALTEES UN NIVEL):
 
 🟢 NIVEL 1 — PRIMERA objeción de precio ("es caro", "no tengo presupuesto", "cuánto sale?"):
-→ DEFENDÉ EL VALOR. Hablá de inversión, no de gasto. "Es una inversión que se paga sola con el primer cliente que te consiga la web. Pago único, sin mensualidad." NO menciones descuento.
+→ DEFENDÉ EL VALOR. Hablá de inversión, no de gasto. "Es una inversión que se paga sola con el primer cliente que te consiga la web." NO menciones descuento.
+⚠️ IMPORTANTE: Landing Page y Sitio Web Completo son pago único SIN mensualidad. El E-commerce tiene un mantenimiento mensual de 25 USD para la tienda online. No digas "sin mensualidad" generalizando — aclará que solo E-commerce tiene mensualidad.
 
 🟡 NIVEL 2 — SEGUNDA objeción de precio (si INSISTE diciendo "muy caro", "no puedo", "no me alcanza", "demasiado") SOLO después de que ya defendiste el valor en Nivel 1:
 → OFRECÉ EL 20% OFF UNA SOLA VEZ. "Mirá, te voy a hacer algo que no solemos hacer: si arrancamos hoy te hago un 20% de descuento."
@@ -75,7 +76,7 @@ PLANES Y PRECIOS:
    - Deploy en producción incluido
    - Entrega en 1 SEMANA
 
-2. Sitio Web Completo — 450 USD (pago único) ⭐ MÁS ELEGIDO
+2. Sitio Web Completo — 450 USD (pago único, sin mensualidad) ⭐ MÁS ELEGIDO
    - Todo lo de Landing Page
    - Secciones ilimitadas
    - Backend con base de datos
@@ -84,17 +85,19 @@ PLANES Y PRECIOS:
    - Integración con APIs
    - Entrega en 2-4 semanas
 
-3. E-commerce — 600 USD (pago único)
+3. E-commerce — 600 USD (pago único) + 25 USD/mes (mantenimiento de tienda)
    - Todo lo del Sitio Web Completo
    - Catálogo de productos con filtros inteligentes
    - Carrito de compra
    - Pasarelas de pago (MercadoPago, etc.)
    - Gestión de stock y pedidos automática
    - Panel admin para productos
+   - Mantenimiento de tienda incluido (25 USD/mes)
    - Entrega en 4-6 semanas
 
-4. Mantenimiento & Soporte — 50 USD/mes
+4. Mantenimiento & Soporte — 25 USD/mes
    - Actualizaciones, backups, monitoreo, seguridad y soporte técnico
+   - Obligatorio para E-commerce, opcional para los demás planes
 
 5. Chatbot con IA — INCLUIDO en todos los planes (sin costo extra)
    - Asistente virtual que atiende consultas 24/7
@@ -137,12 +140,12 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(hola|buenas|hey|buen día|buenas tardes|buenas noches|qué tal|como estás|como andas)\b/i,
     response:
-      "Hola! Bienvenido a Paulero Studio. Te cuento rápido: hacemos webs profesionales a medida desde 250 USD, pago único. ¿Tenés un negocio o proyecto que necesite presencia online? Contame y te recomiendo el plan ideal.",
+      "Hola! Bienvenido a Paulero Studio. Te cuento rápido: hacemos webs profesionales a medida desde 250 USD, pago único. ¿Tenés un negocio o proyecto que necesite presencia online? Contame y te recomiendo el plan ideal."
   },
   {
     patterns: /\b(precio|precios|cuánto|cuanto|cuesta|sale|valor|costo|presupuesto)\b/i,
     response:
-      "Antes de tirarte precios, contame: ¿qué tipo de negocio tenés? Así te recomiendo el plan exacto que necesitás. Pero te adelanto: arrancamos desde 250 USD pago único, sin mensualidades sorpresa. ¿Qué estás buscando?",
+      "Antes de tirarte precios, contame: ¿qué tipo de negocio tenés? Así te recomiendo el plan exacto que necesitás. Pero te adelanto: arrancamos desde 250 USD pago único. ¿Qué estás buscando?"
   },
   {
     patterns: /\b(landing|landing page|una página|página simple|vitrina)\b/i,
@@ -157,12 +160,12 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(e-?commerce|ecommerce|tienda|shop|vender|venta online|carrito|catálogo|pasarela|mercado pago)\b/i,
     response:
-      "Si querés vender online, el **E-commerce** a 600 USD es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. Pago único. ¿Sabés cuántos clientes perdés por no vender online? Hacé click en el botón de WhatsApp a la derecha y lo charlamos.",
+      "Si querés vender online, el **E-commerce** a 600 USD + 25 USD/mes es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. La mensualidad es para el mantenimiento de la tienda. ¿Sabés cuántos clientes perdés por no vender online? Hacé click en el botón de WhatsApp a la derecha y lo charlamos."
   },
   {
     patterns: /\b(mantenimiento|soporte|actualización|backup|seguridad|monitoreo)\b/i,
     response:
-      "El **Mantenimiento & Soporte** a 50 USD/mes te da tranquilidad total: backups, seguridad, actualizaciones y soporte. Se suma a cualquier plan. Pero primero, ¿ya sabés qué plan necesitás? Contame tu proyecto y te guío.",
+      "El **Mantenimiento & Soporte** a 25 USD/mes te da tranquilidad total: backups, seguridad, actualizaciones y soporte. Es obligatorio para E-commerce y opcional para los demás planes. Pero primero, ¿ya sabés qué plan necesitás? Contame tu proyecto y te guío."
   },
   {
     patterns: /\b(servicio|servicios|qué hacés|que haces|qué ofrecen|que ofrecen|ofrecen)\b/i,
@@ -187,12 +190,12 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(pago|pagar|forma de pago|transferencia|dólares|usd)\b/i,
     response:
-      "Los precios son en USD, pago único. Sin mensualidades, sin sorpresas. Para coordinar la forma de pago, hacé click en el botón de WhatsApp a la derecha y acordamos lo que te quede más cómodo. ¿Ya sabés qué plan necesitás?",
+      "Los precios son en USD. Landing Page y Sitio Completo son pago único. El E-commerce tiene un mantenimiento de 25 USD/mes para la tienda. Para coordinar la forma de pago, hacé click en el botón de WhatsApp a la derecha. ¿Ya sabés qué plan necesitás?"
   },
   {
     patterns: /\b(caro|carísimo|mucho|no tengo|presupuesto|pensarlo|después|luego|tal vez|quizás|ver otras|comparar|no puedo|no me alcanza|muy caro|demasiado|imposible|me excede|no hay forma|ni loco|ni hablar|ni pedo|más barato|más económico|descuento|rebaja|oferta|promoción)\b/i,
     response:
-      "Entiendo, pero pensá esto: una web profesional a medida es una inversión que se paga sola con el primer cliente que te contacte. Pago único, sin mensualidad. Y mientras esperás, tu competencia sigue captando clientes online. Hacé click en el botón de WhatsApp a la derecha y encontremos la solución que se ajuste a tu presupuesto.",
+      "Entiendo, pero pensá esto: una web profesional a medida es una inversión que se paga sola con el primer cliente que te contacte. Y mientras esperás, tu competencia sigue captando clientes online. Hacé click en el botón de WhatsApp a la derecha y encontremos la solución que se ajuste a tu presupuesto."
   },
   {
     patterns: /\b(gracias|genial|perfecto|excelente|ok|dale|barbaro|me interesa|quiero|armemos|hagamos)\b/i,
