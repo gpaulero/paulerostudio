@@ -3,9 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // API ROUTE: /api/chat
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Chatbot endpoint — usa fetch puro (sin SDK) para máxima
-// compatibilidad con Vercel serverless.
+// Chatbot endpoint que usa Google Gemini (free tier) para responder
+// consultas sobre los servicios de Paulero Studio.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// API key de Google AI Studio — se puede overridear con env var
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "PLACEHOLDER_API_KEY";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `Sos el asistente virtual de Paulero Studio, el estudio de diseño y desarrollo web de Gonzalo Paulero. Respondés en español argentino (vos, tenés, etc.).
 
@@ -74,43 +78,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await fetch("https://internal-api.z.ai/v1/chat/completions", {
+    // Convertir formato de mensajes al formato de Gemini
+    const contents = messages.map((msg: { role: string; content: string }) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const response = await fetch(GEMINI_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer Z.ai",
-        "X-Z-AI-From": "Z",
-        "X-Chat-Id": "chat-26d906b4-855e-4890-b3f8-4b93d99c858d",
-        "X-Token":
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2VkYWY3MzktZDdjMS00Y2Y0LWEzMDUtNGViZTRjMzdhZWFlIiwiY2hhdF9pZCI6ImNoYXQtMjZkOTA2YjQtODU1ZS00ODkwLWIzZjgtNGI5M2Q5OWM4NThkIiwicGxhdGZvcm0iOiJ6YWkifQ.XFi9rm-Ep75vkGnQoQ1DWPj5IyfRiDxURiJE4If4mW4",
-        "X-User-Id": "cedaf739-d7c1-4cf4-a305-4ebe4c37aeae",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-        thinking: { type: "disabled" },
+        system_instruction: {
+          parts: [{ text: SYSTEM_PROMPT }],
+        },
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Z.ai API error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
       return NextResponse.json(
-        { error: `API error ${response.status}: ${errorText.substring(0, 200)}` },
+        { error: `Gemini error ${response.status}: ${errorText.substring(0, 200)}` },
         { status: 502 }
       );
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reply) {
       return NextResponse.json(
-        { error: "Sin respuesta de la IA", raw: JSON.stringify(data).substring(0, 300) },
+        { error: "Sin respuesta de Gemini", raw: JSON.stringify(data).substring(0, 300) },
         { status: 500 }
       );
     }
