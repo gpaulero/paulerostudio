@@ -90,22 +90,23 @@ function Chatbot() {
           { role: "assistant", content: data.reply },
         ]);
       } else {
+        // Mostrar error real para debug
+        const errorMsg = data.error || data.raw || JSON.stringify(data);
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            content:
-              "No pude procesar tu consulta. Escribime por WhatsApp y te ayudo directamente.",
+            content: `Error del servidor: ${errorMsg}`,
           },
         ]);
       }
-    } catch {
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content:
-            "Hubo un error de conexión. Probá de nuevo o contactame por WhatsApp.",
+          content: `Error de conexión: ${errMsg}`,
         },
       ]);
     } finally {
