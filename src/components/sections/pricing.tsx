@@ -160,25 +160,28 @@ function Pricing() {
 
         {/* Selector de moneda */}
         {mounted && (
-          <div className="mt-10 flex items-center gap-3 flex-wrap">
+          <div className="mt-10 flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Globe className="w-4 h-4" />
               <span>Ver precios en:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {CURRENCIES.map((c) => (
-                <button
-                  key={c.code}
-                  onClick={() => setSelectedCurrency(c.code)}
-                  className={`px-3 py-1.5 text-xs rounded-full border transition-all duration-200 ${
-                    selectedCurrency === c.code
-                      ? "bg-foreground text-background border-foreground font-medium"
-                      : "bg-card/50 border-border/50 text-muted-foreground hover:border-foreground/30"
-                  }`}
-                >
-                  {c.flag} {c.label}
-                </button>
-              ))}
+            <div className="relative">
+              <select
+                value={selectedCurrency}
+                onChange={(e) => setSelectedCurrency(e.target.value)}
+                className="appearance-none bg-card/50 border border-border/50 text-foreground text-sm rounded-lg pl-3 pr-8 py-2 hover:border-foreground/30 focus:outline-none focus:border-foreground/50 transition-colors cursor-pointer"
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.code} — {c.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
         )}
