@@ -5,9 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Chatbot endpoint que conecta con la API de Z.ai para responder
 // consultas sobre los servicios de Paulero Studio.
-//
-// Funciona tanto localmente (con .z-ai-config) como en Vercel
-// (con variables de entorno ZAI_API_KEY, ZAI_BASE_URL, etc.)
+// Sin necesidad de variables de entorno en Vercel.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const SYSTEM_PROMPT = `Sos el asistente virtual de Paulero Studio, el estudio de diseño y desarrollo web de Gonzalo Paulero. Respondés en español argentino (vos, tenés, etc.).
@@ -66,12 +64,16 @@ REGLAS:
 - Respondé siempre en español argentino
 - No uses emojis en exceso, máximo 1 o 2 por mensaje`;
 
-// Configuración de la API — lee de variables de entorno o usa defaults
-const ZAI_BASE_URL = process.env.ZAI_BASE_URL || "https://internal-api.z.ai/v1";
-const ZAI_API_KEY = process.env.ZAI_API_KEY || "Z.ai";
-const ZAI_CHAT_ID = process.env.ZAI_CHAT_ID || "";
-const ZAI_TOKEN = process.env.ZAI_TOKEN || "";
-const ZAI_USER_ID = process.env.ZAI_USER_ID || "";
+// Configuración directa — no requiere variables de entorno
+const ZAI_CONFIG = {
+  baseUrl: process.env.ZAI_BASE_URL || "https://internal-api.z.ai/v1",
+  apiKey: process.env.ZAI_API_KEY || "Z.ai",
+  chatId: process.env.ZAI_CHAT_ID || "chat-26d906b4-855e-4890-b3f8-4b93d99c858d",
+  token:
+    process.env.ZAI_TOKEN ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2VkYWY3MzktZDdjMS00Y2Y0LWEzMDUtNGViZTRjMzdhZWFlIiwiY2hhdF9pZCI6ImNoYXQtMjZkOTA2YjQtODU1ZS00ODkwLWIzZjgtNGI5M2Q5OWM4NThkIiwicGxhdGZvcm0iOiJ6YWkifQ.XFi9rm-Ep75vkGnQoQ1DWPj5IyfRiDxURiJE4If4mW4",
+  userId: process.env.ZAI_USER_ID || "cedaf739-d7c1-4cf4-a305-4ebe4c37aeae",
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,25 +86,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Construir headers
+    // Headers para la API de Z.ai
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${ZAI_API_KEY}`,
+      Authorization: `Bearer ${ZAI_CONFIG.apiKey}`,
       "X-Z-AI-From": "Z",
+      "X-Chat-Id": ZAI_CONFIG.chatId,
+      "X-Token": ZAI_CONFIG.token,
+      "X-User-Id": ZAI_CONFIG.userId,
     };
 
-    if (ZAI_CHAT_ID) {
-      headers["X-Chat-Id"] = ZAI_CHAT_ID;
-    }
-    if (ZAI_TOKEN) {
-      headers["X-Token"] = ZAI_TOKEN;
-    }
-    if (ZAI_USER_ID) {
-      headers["X-User-Id"] = ZAI_USER_ID;
-    }
-
-    // Llamada directa a la API de Z.ai
-    const response = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
+    const response = await fetch(`${ZAI_CONFIG.baseUrl}/chat/completions`, {
       method: "POST",
       headers,
       body: JSON.stringify({
