@@ -132,31 +132,23 @@ section[id] {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TEXTURA DE GRAIN / NOISE CINEMATOGRÁFICA
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Crea una textura de grano sutil sobre todo el sitio,
-   estilo película fotográfica. Se genera con SVG inline
-   y una animación que mueve el patrón para que se vea orgánico.
-   El pointer-events: none asegura que no bloquee clics.
+   Textura de grano sutil estilo película fotográfica.
+   Se genera con un SVG de ruido inline como fondo.
+   Es estática (sin animación) para que no se note como un cuadrado.
+   pointer-events: none asegura que no bloquee clics.
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 body::after {
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-  background-size: 256px 256px;
-  animation: grain 0.5s steps(6) infinite;
-}
-
-@keyframes grain {
-  0%, 100% { transform: translate(0, 0); }
-  10% { transform: translate(-5%, -10%); }
-  30% { transform: translate(3%, -15%); }
-  50% { transform: translate(-10%, 5%); }
-  70% { transform: translate(8%, 10%); }
-  90% { transform: translate(-3%, 8%); }
+  background-size: 512px 512px;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -170,19 +162,22 @@ body::after {
   background: linear-gradient(
     135deg,
     oklch(0.08 0 0) 0%,
-    oklch(0.12 0.01 260) 25%,
-    oklch(0.08 0 0) 50%,
-    oklch(0.12 0.01 200) 75%,
-    oklch(0.08 0 0) 100%
+    oklch(0.14 0.015 260) 20%,
+    oklch(0.10 0.01 220) 40%,
+    oklch(0.14 0.015 280) 60%,
+    oklch(0.08 0 0) 80%,
+    oklch(0.12 0.01 240) 100%
   );
-  background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
+  background-size: 300% 300%;
+  animation: gradient-shift 20s ease infinite;
 }
 
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
 ::selection {
