@@ -36,7 +36,7 @@ function Pricing() {
     },
     {
       name: "Sitio Web Completo",
-      price: "600 USD",
+      price: "450 USD",
       period: "pago único",
       description: "Para negocios que necesitan más que una vitrina: funcionalidades reales y backend robusto.",
       features: [
@@ -52,7 +52,7 @@ function Pricing() {
     },
     {
       name: "E-commerce",
-      price: "1.000 USD",
+      price: "600 USD",
       period: "pago único",
       description: "Tienda online completa para vender 24/7 con pasarelas de pago y gestión de stock.",
       features: [
