@@ -25,6 +25,7 @@ import FAQ from "@/components/sections/faq";
 import Contact from "@/components/sections/contact";
 import Footer from "@/components/sections/footer";
 import WhatsAppButton from "@/components/sections/whatsapp-button";
+import Chatbot from "@/components/sections/chatbot";
 
 export default function Home() {
   return (
@@ -43,6 +44,7 @@ export default function Home() {
       </main>
       <Footer />
       <WhatsAppButton />
+      <Chatbot />
     </div>
   );
 }
