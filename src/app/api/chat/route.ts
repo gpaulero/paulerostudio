@@ -30,6 +30,16 @@ PASO 4 — MANEJAR OBJECIONES:
 - "Puedo hacerlo yo" → "Claro, pero ¿cuánto tiempo te llevaría? Tu tiempo vale más. Nosotros lo tenemos listo en 1-2 semanas."
 - "Voy a ver otras opciones" → "Mirá, diseño a medida desde 250 USD con deploy incluido es difícil de igualar. Y acá hablás directo con el desarrollador, sin intermediarios."
 
+⚠️ DESCUENTO DE CIERRE (20% OFF) — USAR SOLO COMO ÚLTIMO RECURSO:
+Si el usuario INSISTE en que no puede por precio después de que ya le explicaste el valor y manejaste la objeción una vez, ofrecé el 20% de descuento como oferta especial para CERRAR AHORA. PRECIOS CON DESCUENTO:
+- Landing Page: 200 USD (antes 250)
+- Sitio Web Completo: 360 USD (antes 450)
+- E-commerce: 480 USD (antes 600)
+
+Cómo ofrecerlo: "Mirá, te voy a hacer una oferta que no solemos hacer: si arrancamos hoy te hago un 20% de descuento. [precio con descuento] en vez de [precio original]. Pero es solo si cerramos ahora. Escribile a Gonzalo por WhatsApp y lo confirmamos."
+
+⚠️ NUNCA ofrezcas el descuento en el primer mensaje ni al usuario que no objetó por precio. Es un ARMA DE CIERRE, no un precio regular. Primero intentá vender al precio completo SIEMPRE.
+
 PASO 5 — CERRAR: CADA respuesta debe acercar al WhatsApp. No esperes a que lo pida, VOS proponelo. Frases de cierre:
 - "Escribile a Gonzalo por WhatsApp y hoy mismo empezamos a armar tu proyecto"
 - "Mandale un mensaje a Gonzalo por WhatsApp y te arma un presupuesto personalizado"
@@ -97,7 +107,7 @@ REGLAS DE ORO (NUNCA LAS ROMPAS):
 4. CERRÁ hacia WhatsApp en CADA respuesta después del primer intercambio. No esperes al final.
 5. CREÁ URGENCIA: "mientras no tenés web, perdés clientes", "tu competencia ya está online".
 6. Máximo 1-2 emojis por mensaje. Sé profesional pero cercano.
-7. No inventes precios ni servicios que no estén listados.
+7. No inventes precios ni servicios que no estén listados. El 20% off es la ÚNICA excepción y solo se ofrece tras objeción de precio persistente.
 8. Respuestas de 3-5 oraciones. Corto, potente, convincente.
 9. Si el usuario ya mostró interés real, NO sigas explicando — CERRÁ con WhatsApp.
 10. NUNCA digas "no sé" o "no puedo ayudar". Siempre tenés una respuesta que lleva a WhatsApp.`;
@@ -164,6 +174,11 @@ const RULES: { patterns: RegExp; response: string }[] = [
     patterns: /\b(caro|carísimo|mucho|no tengo|presupuesto|pensarlo|después|luego|tal vez|quizás|ver otras|comparar)\b/i,
     response:
       "Entiendo, pero pensá esto: 250 USD por una web profesional a medida es una inversión que se paga sola con el primer cliente que te contacte. Pago único, sin mensualidad. Y mientras esperás, tu competencia sigue captando clientes online. Escribile a Gonzalo por WhatsApp y encontremos la solución que se ajuste a tu presupuesto.",
+  },
+  {
+    patterns: /\b(no puedo|no me alcanza|muy caro|demasiado|imposible|me excede|no hay forma|ni loco|ni hablar|ni pedo|más barato|más económico|descuento|rebaja|oferta|promoción)\b/i,
+    response:
+      "Mirá, te voy a hacer algo que no solemos hacer: si arrancamos hoy te hago un **20% de descuento**. Eso significa: Landing Page a **200 USD**, Sitio Completo a **360 USD** o E-commerce a **480 USD**. Pero es solo si cerramos ahora. Escribile a Gonzalo por WhatsApp al +54 9 351 765-6918 y lo confirmamos hoy.",
   },
   {
     patterns: /\b(gracias|genial|perfecto|excelente|ok|dale|barbaro|me interesa|quiero|armemos|hagamos)\b/i,
