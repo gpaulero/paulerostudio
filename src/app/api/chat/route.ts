@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // API ROUTE: /api/chat
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Chatbot endpoint que usa z-ai-web-dev-sdk para responder
+// Chatbot endpoint que conecta con la API de Z.ai para responder
 // consultas sobre los servicios de Paulero Studio.
+//
+// Funciona tanto localmente (con .z-ai-config) como en Vercel
+// (con variables de entorno ZAI_API_KEY, ZAI_BASE_URL, etc.)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const SYSTEM_PROMPT = `Sos el asistente virtual de Paulero Studio, el estudio de diseño y desarrollo web de Gonzalo Paulero. Respondés en español argentino (vos, tenés, etc.).
@@ -64,6 +66,13 @@ REGLAS:
 - Respondé siempre en español argentino
 - No uses emojis en exceso, máximo 1 o 2 por mensaje`;
 
+// Configuración de la API — lee de variables de entorno o usa defaults
+const ZAI_BASE_URL = process.env.ZAI_BASE_URL || "https://internal-api.z.ai/v1";
+const ZAI_API_KEY = process.env.ZAI_API_KEY || "Z.ai";
+const ZAI_CHAT_ID = process.env.ZAI_CHAT_ID || "";
+const ZAI_TOKEN = process.env.ZAI_TOKEN || "";
+const ZAI_USER_ID = process.env.ZAI_USER_ID || "";
+
 export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json();
@@ -75,18 +84,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const zai = await ZAI.create();
+    // Construir headers
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${ZAI_API_KEY}`,
+      "X-Z-AI-From": "Z",
+    };
 
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...messages,
-      ],
-      temperature: 0.7,
-      max_tokens: 500,
+    if (ZAI_CHAT_ID) {
+      headers["X-Chat-Id"] = ZAI_CHAT_ID;
+    }
+    if (ZAI_TOKEN) {
+      headers["X-Token"] = ZAI_TOKEN;
+    }
+    if (ZAI_USER_ID) {
+      headers["X-User-Id"] = ZAI_USER_ID;
+    }
+
+    // Llamada directa a la API de Z.ai
+    const response = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messages,
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
     });
 
-    const reply = completion.choices?.[0]?.message?.content;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Z.ai API error:", response.status, errorText);
+      return NextResponse.json(
+        { error: "Error del servicio de IA" },
+        { status: 502 }
+      );
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content;
 
     if (!reply) {
       return NextResponse.json(
