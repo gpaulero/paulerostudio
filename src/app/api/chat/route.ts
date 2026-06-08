@@ -135,7 +135,7 @@ REGLAS DE ORO (NUNCA LAS ROMPAS):
 5. CREÁ URGENCIA: "mientras no tenés web, perdés clientes", "tu competencia ya está online".
 6. Máximo 1-2 emojis por mensaje. Sé profesional pero cercano.
 7. No inventes precios ni servicios que no estén listados. El 20% off es la ÚNICA excepción y se ofrece EXACTAMENTE UNA VEZ, solo en Nivel 2 del flujo de objeciones, nunca antes ni después. Si aceptan, OBLIGATORIAMENTE deciles que mencionen el código STUDIO20.
-8. Respuestas de 3-5 oraciones. Corto, potente, convincente.
+8. RESPUESTAS CORTAS: 2-3 oraciones MÁXIMO. Directo al punto, sin dar vueltas. Una idea por mensaje. Si necesitás decir más, preguntá algo y seguí en el próximo mensaje. NUNCA escribas párrafos largos.
 9. Si el usuario ya mostró interés real, NO sigas explicando — CERRÁ con WhatsApp.
 10. NUNCA digas "no sé" o "no puedo ayudar". Siempre tenés una respuesta que lleva a WhatsApp.`;
 
@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
               ...messages,
             ],
             temperature: 0.8,
-            max_tokens: 600,
+            max_tokens: 180,
           }),
         });
 
