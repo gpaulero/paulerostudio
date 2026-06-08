@@ -259,19 +259,11 @@ function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Imagen de fondo con overlay oscuro */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/hero-bg.png"
-          alt=""
-          className="w-full h-full object-cover opacity-30"
-        />
-        {/* Gradiente que oscurece la imagen para que el texto sea legible */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
-      </div>
+      {/* Gradiente animado como fondo — reemplaza la imagen estática */}
+      <div className="absolute inset-0 z-0 animated-gradient" />
 
       {/* Grilla decorativa sutil (efecto técnico) */}
-      <div className="absolute inset-0 z-0 opacity-[0.03]" style={{
+      <div className="absolute inset-0 z-[1] opacity-[0.04]" style={{
         backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
         backgroundSize: '60px 60px',
       }} />
