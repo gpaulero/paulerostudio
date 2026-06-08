@@ -132,38 +132,14 @@ function Navigation() {
           </Button>
         </div>
 
-        {/* Botón hamburguesa + theme toggle - visible solo en mobile (lg:hidden) */}
-        <div className="lg:hidden flex items-center gap-2">
-          {/* Toggle de tema mobile */}
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-foreground/10 transition-colors"
-            aria-label="Cambiar tema"
-          >
-            {mounted && (
-              <motion.div
-                key={theme}
-                initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-4 h-4" />
-                ) : (
-                  <Moon className="w-4 h-4" />
-                )}
-              </motion.div>
-            )}
-          </button>
-
-          <button
-            className="text-foreground"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {/* Condicional: muestra X o Menu según el estado */}
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+        {/* Botón hamburguesa - visible solo en mobile (lg:hidden) */}
+        <button
+          className="lg:hidden text-foreground"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          {/* Condicional: muestra X o Menu según el estado */}
+          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
 
       {/* Menú desplegable mobile con animación de entrada/salida */}
@@ -186,6 +162,29 @@ function Navigation() {
                   {link.label}
                 </a>
               ))}
+
+              {/* Toggle de tema dentro del menú mobile */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                {mounted && (
+                  <motion.div
+                    key={theme}
+                    initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="w-4 h-4" />
+                    ) : (
+                      <Moon className="w-4 h-4" />
+                    )}
+                  </motion.div>
+                )}
+                {mounted && (theme === "dark" ? "Modo claro" : "Modo oscuro")}
+              </button>
+
               <Button
                 variant="outline"
                 size="sm"
