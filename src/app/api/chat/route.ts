@@ -31,10 +31,11 @@ PASO 4 — MANEJAR OBJECIONES POR PRECIO (FLUJO DE 3 NIVELES, NUNCA TE SALTEES U
 🟡 NIVEL 2 — SEGUNDA objeción de precio (si INSISTE diciendo "muy caro", "no puedo", "no me alcanza", "demasiado") SOLO después de que ya defendiste el valor en Nivel 1:
 → OFRECÉ EL 20% OFF UNA SOLA VEZ. "Mirá, te voy a hacer algo que no solemos hacer: si arrancamos hoy te hago un 20% de descuento."
 PRECIOS CON DESCUENTO: Landing Page 200 USD, Sitio Completo 360 USD, E-commerce 480 USD.
-Presentalo como oferta exclusiva y urgente: "solo si cerramos ahora. Escribile a Gonzalo por WhatsApp y lo confirmamos."
+Presentalo como oferta exclusiva y urgente: "solo si cerramos ahora. Hacé click en el botón de WhatsApp a la derecha, mencionale el código STUDIO20 y te lo confirmamos."
+⚠️ Si el usuario ACEPTA el descuento, SIEMPRE decile que mencione el código **STUDIO20** a Gonzalo por WhatsApp. Esto es OBLIGATORIO.
 
 🔴 NIVEL 3 — Si DESPUÉS del descuento SIGUE resistiéndose:
-→ VOLVÉ AL VALOR Y URGENCIA, NUNCA repitas el descuento. "Entiendo, pero pensá cuántos clientes perdés cada día sin web profesional. Por 200 USD tenés una web a medida lista en una semana. Escribile a Gonzalo por WhatsApp y charlamos."
+→ VOLVÉ AL VALOR Y URGENCIA, NUNCA repitas el descuento. "Entiendo, pero pensá cuántos clientes perdés cada día sin web profesional. Hacé click en el botón de WhatsApp a la derecha y charlamos, seguro encontramos la forma de que tengas tu web."
 
 ⚠️ REGLAS ABSOLUTAS DEL DESCUENTO:
 - NUNCA ofrezcas descuento en la PRIMERA objeción de precio. SIEMPRR defendé el valor primero.
@@ -47,11 +48,14 @@ OTRAS OBJECIONES:
 - "Puedo hacerlo yo" → "Claro, pero ¿cuánto tiempo te llevaría? Tu tiempo vale más. Nosotros lo tenemos listo en 1-2 semanas."
 - "Voy a ver otras opciones" → "Mirá, diseño a medida desde 250 USD con deploy incluido es difícil de igualar. Y acá hablás directo con el desarrollador, sin intermediarios."
 
-PASO 5 — CERRAR: CADA respuesta debe acercar al WhatsApp. No esperes a que lo pida, VOS proponelo. Frases de cierre:
-- "Escribile a Gonzalo por WhatsApp y hoy mismo empezamos a armar tu proyecto"
-- "Mandale un mensaje a Gonzalo por WhatsApp y te arma un presupuesto personalizado"
-- "Hablemos por WhatsApp, así revisamos tu caso y te decimos exactamente qué necesitás"
-- "Escribinos por WhatsApp y te cuento cómo podemos tener tu web lista esta semana"
+PASO 5 — CERRAR: CADA respuesta debe derivar a WhatsApp. No esperes a que lo pida, VOS proponelo. NUNCA des el número de WhatsApp, SIEMPRE decile que haga click en el botón verde de WhatsApp que aparece a la derecha de la pantalla. Frases de cierre:
+- "Hacé click en el botón de WhatsApp a la derecha y hoy mismo empezamos a armar tu proyecto"
+- "Click en el botón verde de WhatsApp a tu derecha y Gonzalo te arma un presupuesto personalizado"
+- "Apretá el botón de WhatsApp a la derecha y charlamos tu caso"
+- "Hacé click en el botón de WhatsApp de la derecha y te cuento cómo tener tu web lista esta semana"
+
+🔑 CÓDIGO DE DESCUENTO: Si el usuario ACEPTA el 20% off, OBLIGATORIAMENTE decile que mencione el código **STUDIO20** cuando hable con Gonzalo por WhatsApp. Ejemplo: "Decile a Gonzalo el código **STUDIO20** y automáticamente te aplica el 20% de descuento. Hacé click en el botón de WhatsApp a la derecha y se lo mencionás."
+Esto es MANDATORIO cuando alguien acepta el descuento, para que Gonzalo sepa que el descuento viene del chatbot.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 INFORMACIÓN DEL ESTUDIO:
@@ -102,8 +106,9 @@ PRUEBA SOCIAL — PROYECTOS REALES:
 - Etersomos: Sitio con backend personalizado, sistema de reservas y CMS propio
 
 CONTACTO:
-- WhatsApp: +54 9 351 765-6918
+- WhatsApp: El visitante debe hacer click en el botón verde de WhatsApp que aparece a la derecha de la pantalla. NUNCA des el número de teléfono directamente.
 - Email: gpaulero@gmail.com
+- Código de descuento: **STUDIO20** — Cuando alguien acepta el 20% off, decile que mencione este código a Gonzalo por WhatsApp. ES OBLIGATORIO mencionar el código cuando se acepta el descuento.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS DE ORO (NUNCA LAS ROMPAS):
@@ -111,10 +116,10 @@ REGLAS DE ORO (NUNCA LAS ROMPAS):
 1. VENDÉ, NO INFORMES. Cada mensaje debe avanzar la venta.
 2. PREGUNTÁ antes de recomendar. No tires precios sin saber qué necesita.
 3. HABLÁ con CONVICCIÓN. "Te conviene" no "quizás te sirva". "Es el mejor plan para vos" no "podría funcionar".
-4. CERRÁ hacia WhatsApp en CADA respuesta después del primer intercambio. No esperes al final.
+4. CERRÁ hacia WhatsApp en CADA respuesta después del primer intercambio. No esperes al final. NUNCA des el número, decile SIEMPRE "hacé click en el botón de WhatsApp a la derecha".
 5. CREÁ URGENCIA: "mientras no tenés web, perdés clientes", "tu competencia ya está online".
 6. Máximo 1-2 emojis por mensaje. Sé profesional pero cercano.
-7. No inventes precios ni servicios que no estén listados. El 20% off es la ÚNICA excepción y se ofrece EXACTAMENTE UNA VEZ, solo en Nivel 2 del flujo de objeciones, nunca antes ni después.
+7. No inventes precios ni servicios que no estén listados. El 20% off es la ÚNICA excepción y se ofrece EXACTAMENTE UNA VEZ, solo en Nivel 2 del flujo de objeciones, nunca antes ni después. Si aceptan, OBLIGATORIAMENTE deciles que mencionen el código STUDIO20.
 8. Respuestas de 3-5 oraciones. Corto, potente, convincente.
 9. Si el usuario ya mostró interés real, NO sigas explicando — CERRÁ con WhatsApp.
 10. NUNCA digas "no sé" o "no puedo ayudar". Siempre tenés una respuesta que lleva a WhatsApp.`;
@@ -135,17 +140,17 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(landing|landing page|una página|página simple|vitrina)\b/i,
     response:
-      "La **Landing Page** a 250 USD es perfecta si necesitás salir YA a internet. Diseño a medida, responsive, SEO, y la tenés lista en 1 semana. Pago único, sin sorpresas. ¿Querés que la tengamos online esta semana? Escribile a Gonzalo por WhatsApp al +54 9 351 765-6918 y arrancamos.",
+      "La **Landing Page** a 250 USD es perfecta si necesitás salir YA a internet. Diseño a medida, responsive, SEO, y la tenés lista en 1 semana. Pago único, sin sorpresas. ¿Querés que la tengamos online esta semana? Hacé click en el botón de WhatsApp a la derecha y arrancamos.",
   },
   {
     patterns: /\b(sitio web completo|sitio completo|web completo|intermedio)\b/i,
     response:
-      "El **Sitio Web Completo** a 450 USD es nuestro plan más elegido — y no es casualidad. Panel admin, backend, CMS, secciones ilimitadas. Vos manejás todo sin depender de nadie. Entrega en 2-4 semanas. Escribile a Gonzalo por WhatsApp y te armamos tu proyecto a medida.",
+      "El **Sitio Web Completo** a 450 USD es nuestro plan más elegido — y no es casualidad. Panel admin, backend, CMS, secciones ilimitadas. Vos manejás todo sin depender de nadie. Entrega en 2-4 semanas. Hacé click en el botón de WhatsApp a la derecha y te armamos tu proyecto a medida.",
   },
   {
     patterns: /\b(e-?commerce|ecommerce|tienda|shop|vender|venta online|carrito|catálogo|pasarela|mercado pago)\b/i,
     response:
-      "Si querés vender online, el **E-commerce** a 600 USD es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. Pago único. ¿Sabés cuántos clientes perdés por no vender online? Hablemos por WhatsApp y te lo tenemos listo.",
+      "Si querés vender online, el **E-commerce** a 600 USD es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. Pago único. ¿Sabés cuántos clientes perdés por no vender online? Hacé click en el botón de WhatsApp a la derecha y lo charlamos.",
   },
   {
     patterns: /\b(mantenimiento|soporte|actualización|backup|seguridad|monitoreo)\b/i,
@@ -160,32 +165,32 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(tecnología|tecnologias|tech|stack|herramienta|framework)\b/i,
     response:
-      "Usamos Next.js, React, TypeScript, Tailwind CSS, Prisma y PostgreSQL. La misma tecnología que usan Netflix y Uber. Tu web va a ser rápida, moderna y escalable. ¿Querés que charlemos tu proyecto? Mandale un mensaje a Gonzalo por WhatsApp.",
+      "Usamos Next.js, React, TypeScript, Tailwind CSS, Prisma y PostgreSQL. La misma tecnología que usan Netflix y Uber. Tu web va a ser rápida, moderna y escalable. ¿Querés que charlemos tu proyecto? Hacé click en el botón de WhatsApp a la derecha.",
   },
   {
     patterns: /\b(contacto|contactar|whatsapp|email|hablar|charlar|consultar|escribir)\b/i,
     response:
-      "Escribile a Gonzalo directo por **WhatsApp** al +54 9 351 765-6918. Respondé rápido y armamos tu proyecto. ¡No pierdas más clientes sin web profesional!",
+      "Hacé click en el botón verde de **WhatsApp** a la derecha de la pantalla y hablamos directo. Respondemos rápido y armamos tu proyecto. ¡No pierdas más clientes sin web profesional!",
   },
   {
     patterns: /\b(tiempo|plazo|demora|cuánto tarda|entrega|cuándo listo)\b/i,
     response:
-      "Rápido: Landing Page 1 semana, Sitio Web Completo 2-4 semanas, E-commerce 4-6 semanas. Mientras tanto, ¿tu competencia ya está online? No perdas más tiempo, escribinos por WhatsApp y arrancamos hoy.",
+      "Rápido: Landing Page 1 semana, Sitio Web Completo 2-4 semanas, E-commerce 4-6 semanas. Mientras tanto, ¿tu competencia ya está online? No perdas más tiempo, hacé click en el botón de WhatsApp a la derecha y arrancamos hoy.",
   },
   {
     patterns: /\b(pago|pagar|forma de pago|transferencia|dólares|usd)\b/i,
     response:
-      "Los precios son en USD, pago único. Sin mensualidades, sin sorpresas. Para coordinar la forma de pago, escribinos por WhatsApp y acordamos lo que te quede más cómodo. ¿Ya sabés qué plan necesitás?",
+      "Los precios son en USD, pago único. Sin mensualidades, sin sorpresas. Para coordinar la forma de pago, hacé click en el botón de WhatsApp a la derecha y acordamos lo que te quede más cómodo. ¿Ya sabés qué plan necesitás?",
   },
   {
     patterns: /\b(caro|carísimo|mucho|no tengo|presupuesto|pensarlo|después|luego|tal vez|quizás|ver otras|comparar|no puedo|no me alcanza|muy caro|demasiado|imposible|me excede|no hay forma|ni loco|ni hablar|ni pedo|más barato|más económico|descuento|rebaja|oferta|promoción)\b/i,
     response:
-      "Entiendo, pero pensá esto: una web profesional a medida es una inversión que se paga sola con el primer cliente que te contacte. Pago único, sin mensualidad. Y mientras esperás, tu competencia sigue captando clientes online. Escribile a Gonzalo por WhatsApp y encontremos la solución que se ajuste a tu presupuesto.",
+      "Entiendo, pero pensá esto: una web profesional a medida es una inversión que se paga sola con el primer cliente que te contacte. Pago único, sin mensualidad. Y mientras esperás, tu competencia sigue captando clientes online. Hacé click en el botón de WhatsApp a la derecha y encontremos la solución que se ajuste a tu presupuesto.",
   },
   {
     patterns: /\b(gracias|genial|perfecto|excelente|ok|dale|barbaro|me interesa|quiero|armemos|hagamos)\b/i,
     response:
-      "¡Dale! No pierdas más tiempo. Escribile a Gonzalo por WhatsApp al +54 9 351 765-6918 y hoy mismo empezamos a armar tu proyecto. Tu web profesional está más cerca de lo que pensás.",
+      "¡Dale! No pierdas más tiempo. Hacé click en el botón de WhatsApp a la derecha y hoy mismo empezamos a armar tu proyecto. Tu web profesional está más cerca de lo que pensás.",
   },
 ];
 
@@ -199,7 +204,7 @@ function getRuleBasedResponse(message: string): string | null {
 }
 
 const FALLBACK =
-    "Contame qué necesitas para tu negocio y te recomiendo el plan ideal. También podés escribirle directo a Gonzalo por WhatsApp al +54 9 351 765-6918 y te arma un presupuesto personalizado. ¿Qué tipo de proyecto tenés en mente?";
+    "Contame qué necesitas para tu negocio y te recomiendo el plan ideal. Hacé click en el botón de WhatsApp a la derecha y Gonzalo te arma un presupuesto personalizado. ¿Qué tipo de proyecto tenés en mente?";
 
 export async function POST(request: NextRequest) {
   try {
