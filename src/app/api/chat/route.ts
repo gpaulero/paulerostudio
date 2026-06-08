@@ -5,8 +5,24 @@ import { NextRequest, NextResponse } from "next/server";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Chatbot endpoint que conecta con la API de Z.ai para responder
 // consultas sobre los servicios de Paulero Studio.
-// Sin necesidad de variables de entorno en Vercel.
+// Usa el SDK directamente con config inyectada (sin archivos).
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Import dinámico para evitar problemas de SSR con fs/path del SDK
+async function createZAI() {
+  const ZAIModule = await import("z-ai-web-dev-sdk");
+  const ZAI = ZAIModule.default;
+
+  // Inyectar config directamente — no usa loadConfig ni archivos
+  return new ZAI({
+    baseUrl: "https://internal-api.z.ai/v1",
+    apiKey: "Z.ai",
+    chatId: "chat-26d906b4-855e-4890-b3f8-4b93d99c858d",
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2VkYWY3MzktZDdjMS00Y2Y0LWEzMDUtNGViZTRjMzdhZWFlIiwiY2hhdF9pZCI6ImNoYXQtMjZkOTA2YjQtODU1ZS00ODkwLWIzZjgtNGI5M2Q5OWM4NThkIiwicGxhdGZvcm0iOiJ6YWkifQ.XFi9rm-Ep75vkGnQoQ1DWPj5IyfRiDxURiJE4If4mW4",
+    userId: "cedaf739-d7c1-4cf4-a305-4ebe4c37aeae",
+  });
+}
 
 const SYSTEM_PROMPT = `Sos el asistente virtual de Paulero Studio, el estudio de diseño y desarrollo web de Gonzalo Paulero. Respondés en español argentino (vos, tenés, etc.).
 
@@ -64,17 +80,6 @@ REGLAS:
 - Respondé siempre en español argentino
 - No uses emojis en exceso, máximo 1 o 2 por mensaje`;
 
-// Configuración directa — no requiere variables de entorno
-const ZAI_CONFIG = {
-  baseUrl: process.env.ZAI_BASE_URL || "https://internal-api.z.ai/v1",
-  apiKey: process.env.ZAI_API_KEY || "Z.ai",
-  chatId: process.env.ZAI_CHAT_ID || "chat-26d906b4-855e-4890-b3f8-4b93d99c858d",
-  token:
-    process.env.ZAI_TOKEN ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2VkYWY3MzktZDdjMS00Y2Y0LWEzMDUtNGViZTRjMzdhZWFlIiwiY2hhdF9pZCI6ImNoYXQtMjZkOTA2YjQtODU1ZS00ODkwLWIzZjgtNGI5M2Q5OWM4NThkIiwicGxhdGZvcm0iOiJ6YWkifQ.XFi9rm-Ep75vkGnQoQ1DWPj5IyfRiDxURiJE4If4mW4",
-  userId: process.env.ZAI_USER_ID || "cedaf739-d7c1-4cf4-a305-4ebe4c37aeae",
-};
-
 export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json();
@@ -86,42 +91,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Headers para la API de Z.ai
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${ZAI_CONFIG.apiKey}`,
-      "X-Z-AI-From": "Z",
-      "X-Chat-Id": ZAI_CONFIG.chatId,
-      "X-Token": ZAI_CONFIG.token,
-      "X-User-Id": ZAI_CONFIG.userId,
-    };
+    const zai = await createZAI();
 
-    const response = await fetch(`${ZAI_CONFIG.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
+    const completion = await zai.chat.completions.create({
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...messages,
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Z.ai API error:", response.status, errorText);
-      return NextResponse.json(
-        { error: "Error del servicio de IA" },
-        { status: 502 }
-      );
-    }
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
+    const reply = completion.choices?.[0]?.message?.content;
 
     if (!reply) {
+      console.error("No reply in completion:", JSON.stringify(completion).substring(0, 300));
       return NextResponse.json(
         { error: "No se pudo generar una respuesta" },
         { status: 500 }
@@ -130,9 +114,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ reply });
   } catch (error: any) {
-    console.error("Error en /api/chat:", error);
+    console.error("Error en /api/chat:", error?.message || error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: "Error interno del servidor: " + (error?.message || "unknown") },
       { status: 500 }
     );
   }
