@@ -1,0 +1,164 @@
+[
+  {
+    "name": "CBA Automotores",
+    "url": "https://cbaautomotores.com.ar",
+    "status": 200,
+    "title": "CBA Automotores — Usados, 0 km y consignaciones en Villa Carlos Paz",
+    "has_viewport": true,
+    "has_meta_desc": true,
+    "is_canva_wix_sites": false,
+    "html_chars": 128682,
+    "notes": [
+      "Sin H1 (estructura SEO pobre)"
+    ],
+    "evaluacion": "Decente"
+  },
+  {
+    "name": "La Falda Automotores",
+    "url": "https://lafaldaautomotores.com",
+    "status": 403,
+    "title": "",
+    "has_viewport": false,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": false,
+    "html_chars": 0,
+    "notes": [
+      "HTTP error 403"
+    ],
+    "evaluacion": "Inaccesible"
+  },
+  {
+    "name": "DG Automotores",
+    "url": "https://www.dgautomotores.com.ar",
+    "status": 200,
+    "title": "DG Automotores | Autos seleccionados en Córdoba",
+    "has_viewport": true,
+    "has_meta_desc": true,
+    "is_canva_wix_sites": false,
+    "html_chars": 2105,
+    "notes": [
+      "Sin H1 (estructura SEO pobre)"
+    ],
+    "evaluacion": "Decente pero simple"
+  },
+  {
+    "name": "Automotores Chahin (KIA)",
+    "url": "https://www.automotoreschahin.com.ar",
+    "status": 200,
+    "title": "Concesionaria KIA: AUTOMOTORES CHAHIN, concesionario oficial KIA en Cordoba Argentina",
+    "has_viewport": false,
+    "has_meta_desc": true,
+    "is_canva_wix_sites": false,
+    "html_chars": 900,
+    "notes": [
+      "Sin meta viewport (probablemente NO responsive)",
+      "Sin H1 (estructura SEO pobre)"
+    ],
+    "evaluacion": "Obsoleta / básica"
+  },
+  {
+    "name": "SP Automotores (Canva)",
+    "url": "https://spautomotores.my.canva.site",
+    "status": 200,
+    "title": "SP AUTOMOTORES",
+    "has_viewport": true,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": true,
+    "html_chars": 84676,
+    "notes": [
+      "Sin meta description (SEO débil)",
+      "Hecho en Canva (no es sitio profesional)",
+      "Sin H1 (estructura SEO pobre)"
+    ],
+    "evaluacion": "Web amateur (Canva/Wix/Google Sites)"
+  },
+  {
+    "name": "Montironi Ford",
+    "url": "https://montironiford.com",
+    "status": 200,
+    "title": "MONTIRONI FORD &#8211; Concesionario oficial de Ford en Córdoba &#8211; MONTIRONI FORD &#8211; Concesionario oficial de ",
+    "has_viewport": true,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": true,
+    "html_chars": 199871,
+    "notes": [
+      "Sin meta description (SEO débil)",
+      "Hecho en Canva (no es sitio profesional)"
+    ],
+    "evaluacion": "Web amateur (Canva/Wix/Google Sites)"
+  },
+  {
+    "name": "Dos Ruedas La Falda (Wix)",
+    "url": "https://dosruedasconsultas.wixsite.com/dos-ruedas",
+    "status": 200,
+    "title": "DOS RUEDAS LA FALDA",
+    "has_viewport": true,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": true,
+    "html_chars": 199935,
+    "notes": [
+      "Sin meta description (SEO débil)",
+      "Hecho en Canva (no es sitio profesional)",
+      "Hecho en Wix (limitado)"
+    ],
+    "evaluacion": "Web amateur (Canva/Wix/Google Sites)"
+  },
+  {
+    "name": "Automotores Martínez (Google Sites)",
+    "url": "https://sites.google.com/view/automotoresmartinez/p%C3%A1gina-principal",
+    "status": 200,
+    "title": "Automotores Martinez",
+    "has_viewport": true,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": true,
+    "html_chars": 184803,
+    "notes": [
+      "Sin meta description (SEO débil)",
+      "Google Sites (no es sitio profesional)"
+    ],
+    "evaluacion": "Web amateur (Canva/Wix/Google Sites)"
+  },
+  {
+    "name": "Montironi (corporativo)",
+    "url": "https://montironi.com",
+    "status": 200,
+    "title": "Un momento…",
+    "has_viewport": true,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": false,
+    "html_chars": 11791,
+    "notes": [
+      "Sin meta description (SEO débil)",
+      "Sin H1 (estructura SEO pobre)"
+    ],
+    "evaluacion": "Decente pero simple"
+  },
+  {
+    "name": "AutoFamily",
+    "url": "https://autofamily.com.ar",
+    "status": "ERR",
+    "title": "",
+    "has_viewport": false,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": false,
+    "html_chars": 0,
+    "notes": [
+      "Error: <urlopen error timed out>"
+    ],
+    "evaluacion": "Inaccesible"
+  },
+  {
+    "name": "Cetrogar Motos",
+    "url": "https://cetrogarmotos.com.ar",
+    "status": "ERR",
+    "title": "",
+    "has_viewport": false,
+    "has_meta_desc": false,
+    "is_canva_wix_sites": false,
+    "html_chars": 0,
+    "notes": [
+      "Error: <urlopen error timed out>"
+    ],
+    "evaluacion": "Inaccesible"
+  }
+]
