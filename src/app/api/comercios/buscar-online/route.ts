@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getZai } from "@/lib/zai";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // API ROUTE: /api/comercios/buscar-online
@@ -76,8 +77,7 @@ async function extraerComerciosConLLM(
   zona: string,
   resultados: SearchResult[]
 ): Promise<ComercioExtraido[]> {
-  const ZAI = (await import("z-ai-web-dev-sdk")).default;
-  const zai = await ZAI.create();
+  const zai = await getZai();
 
   const contexto = resultados
     .map((r, i) => `#${i + 1}
@@ -155,8 +155,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Paso 1: web_search ──────────────────────────────────────
-    const ZAI = (await import("z-ai-web-dev-sdk")).default;
-    const zai = await ZAI.create();
+    const zai = await getZai();
 
     const query = `${rubro} en ${zona}, Córdoba, Argentina contacto dirección teléfono`;
     const searchResults = (await zai.functions.invoke("web_search", {
