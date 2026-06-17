@@ -182,3 +182,44 @@ Stage Summary:
 - Modal con cambio rápido de estado + historial de seguimientos
 - Botón directo a WhatsApp/teléfono/web de cada comercio
 - Diseño responsive (mobile-first), light theme, emerald accent
+
+---
+Task ID: 14
+Agent: main
+Task: Agregar feature "Buscar online" al CRM — busca comercios por rubro+zona en internet y los carga automáticamente en la base (idempotente).
+
+Work Log:
+- Leído skill `web-search` para entender el uso de `zai.functions.invoke('web_search', { query, num })`.
+- Creada API route `/api/comercios/buscar-online` (POST) que:
+  1. Recibe { rubro, zona } en el body.
+  2. Construye query: `${rubro} en ${zona}, Córdoba, Argentina contacto dirección teléfono`.
+  3. Ejecuta `web_search` con num=20 y filtra resultados que son directorios/redes (Google Maps, FB, IG, Wikipedia, InfoisInfo, etc.).
+  4. Llama al LLM (zai.chat.completions.create) con prompt estricto para extraer JSON estructurado: { comercios: [{ nombre, direccion, telefono, webUrl, redesSociales, estadoWeb, notas }] }. Prompt pide no inventar y devolver [] si no hay comercios reales.
+  5. Idempotencia: normaliza nombres (lowercase, sin acentos, sin sufijos SRL/SA/El/La) y compara contra comercios existentes en esa zona.
+  6. Crea los nuevos con prioridad inferida del estadoWeb (Alta si sin web/amateur, Media si existe, Baja en otro caso).
+  7. Devuelve { ok, message, nuevos[], duplicados, totalResultados }.
+- Creado componente `BuscarOnlineModal` con:
+  - Inputs rubro/zona con datalists (rubros sugeridos: Concesionaria, Hotel, Restaurante, Inmobiliaria, etc. + los ya existentes en la BD).
+  - Estado loading, error, resultado.
+  - Lista de comercios agregados con link "Ver web" cuando tienen URL.
+  - Estadísticas: total resultados en la búsqueda, duplicados omitidos.
+- Actualizado `page.tsx`:
+  - Importado `Globe` de lucide-react y `BuscarOnlineModal`.
+  - Agregado botón "Buscar online" (azul) en el header entre "Cargar relevamiento" y "Nuevo comercio".
+  - Estado `showBuscarOnline` para abrir/cerrar el modal.
+  - Le pasa rubrosExistentes y zonasExistentes para que el datalist los incluya.
+- Probado end-to-end con curl + agent-browser:
+  - curl POST `/api/comercios/buscar-online` con {rubro:"Hotel", zona:"La Falda"} → 7 hoteles nuevos.
+  - curl repetido → 7 duplicados detectados, 1 nuevo agregado (idempotencia OK).
+  - curl con {rubro:"Restaurante", zona:"Cosquín"} → 4 restaurantes nuevos.
+  - curl con rubro/zona inventados → 2 falsos positivos (LLM hallucinó) → borrados + prompt reforzado con reglas explícitas para no inventar.
+  - Browser test: clic en "Buscar online", llenar Inmobiliaria + Villa Carlos Paz → 6 inmobiliarias nuevas con direcciones extraídas del LLM (Güemes 109, Sabattini N°33, etc.). Total en tabla pasó de 44 → 50 comercios.
+- Screenshot guardado en `/home/z/my-project/download/crm-buscar-online-test.png`.
+
+Stage Summary:
+- Feature "Buscar online" totalmente funcional: botón azul en el header del CRM, modal con rubro+zona, búsqueda web + extracción con LLM + carga idempotente en la BD.
+- Permite sumar cualquier rubro en cualquier zona sin tocar código — el CRM ahora se actualiza dinámicamente.
+- Detección automática de estado web (Amateur Canva/Wix/Google Sites, Sin web propia, Existe, etc.) → prioridad Alta/Media/Baja inferida automáticamente.
+- Filtros del CRM se actualizan solos para mostrar los rubros nuevos (Hotel, Restaurante, Inmobiliaria ya aparecen como opciones).
+- Archivos creados: src/app/api/comercios/buscar-online/route.ts, src/components/crm/buscar-online-modal.tsx.
+- Archivos modificados: src/app/page.tsx.

@@ -5,7 +5,8 @@ import { CrmDashboard } from "@/components/crm/dashboard";
 import { ComerciosTable } from "@/components/crm/comercios-table";
 import { ComercioModal } from "@/components/crm/comercio-modal";
 import { NuevoComercioModal } from "@/components/crm/nuevo-comercio-modal";
-import { Plus, Database, RefreshCw, Search } from "lucide-react";
+import { Plus, Database, RefreshCw, Search, Globe } from "lucide-react";
+import { BuscarOnlineModal } from "@/components/crm/buscar-online-modal";
 
 export type Comercio = {
   id: string;
@@ -52,6 +53,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showNuevo, setShowNuevo] = useState(false);
+  const [showBuscarOnline, setShowBuscarOnline] = useState(false);
   const [seedLoading, setSeedLoading] = useState(false);
   const [seedMessage, setSeedMessage] = useState<string | null>(null);
 
@@ -136,6 +138,15 @@ export default function HomePage() {
               )}
               <span className="hidden sm:inline">Cargar relevamiento</span>
               <span className="sm:hidden">Cargar</span>
+            </button>
+            <button
+              onClick={() => setShowBuscarOnline(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition"
+              title="Buscar comercios por rubro en internet y cargarlos automáticamente"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Buscar online</span>
+              <span className="sm:hidden">Online</span>
             </button>
             <button
               onClick={() => setShowNuevo(true)}
@@ -253,6 +264,15 @@ export default function HomePage() {
         <NuevoComercioModal
           onClose={() => setShowNuevo(false)}
           onCreated={() => { setShowNuevo(false); fetchComercios(); }}
+        />
+      )}
+
+      {showBuscarOnline && (
+        <BuscarOnlineModal
+          onClose={() => setShowBuscarOnline(false)}
+          onCreated={fetchComercios}
+          rubrosExistentes={rubros}
+          zonasExistentes={zonas}
         />
       )}
     </div>
