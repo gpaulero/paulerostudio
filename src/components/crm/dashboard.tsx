@@ -1,6 +1,6 @@
 "use client";
 
-import type { Comercio } from "@/app/page";
+import type { Comercio } from "@/lib/crm-types";
 
 export function CrmDashboard({ comercios }: { comercios: Comercio[] }) {
   const total = comercios.length;

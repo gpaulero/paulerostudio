@@ -1,6 +1,6 @@
 "use client";
 
-import type { Comercio } from "@/app/page";
+import type { Comercio } from "@/lib/crm-types";
 import { WhatsAppIcon, ExternalLink, MapPin, Phone } from "@/components/crm/icons";
 import { RefreshCw } from "lucide-react";
 

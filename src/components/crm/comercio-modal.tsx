@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Comercio, Seguimiento } from "@/app/page";
+import type { Comercio, Seguimiento } from "@/lib/crm-types";
 import {
   WhatsAppIcon, ExternalLink, MapPin, Phone, Mail, X,
 } from "@/components/crm/icons";

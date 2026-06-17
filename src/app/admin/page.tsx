@@ -8,37 +8,7 @@ import { NuevoComercioModal } from "@/components/crm/nuevo-comercio-modal";
 import { Plus, Database, RefreshCw, Search, Globe, LogOut } from "lucide-react";
 import { BuscarOnlineModal } from "@/components/crm/buscar-online-modal";
 import { useRouter } from "next/navigation";
-
-export type Comercio = {
-  id: string;
-  nombre: string;
-  rubro: string;
-  zona: string;
-  direccion: string | null;
-  telefono: string | null;
-  whatsapp: string | null;
-  email: string | null;
-  webUrl: string | null;
-  redesSociales: string | null;
-  estadoWeb: string | null;
-  prioridad: "Alta" | "Media" | "Baja";
-  estado: string;
-  notas: string | null;
-  pitchSugerido: string | null;
-  proximaAccion: string | null;
-  fechaProximaAccion: string | null;
-  createdAt: string;
-  updatedAt: string;
-  seguimientos?: Seguimiento[];
-};
-
-export type Seguimiento = {
-  id: string;
-  tipo: string;
-  contenido: string;
-  resultado: string | null;
-  createdAt: string;
-};
+import type { Comercio } from "@/lib/crm-types";
 
 const ESTADOS = [
   "Sin contactar",

@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
     if (prioridad && prioridad !== "todas") where.prioridad = prioridad;
     if (q && q.trim()) {
       where.OR = [
-        { nombre: { contains: q } },
-        { direccion: { contains: q } },
-        { telefono: { contains: q } },
-        { notas: { contains: q } },
-        { redesSociales: { contains: q } },
+        { nombre: { contains: q, mode: "insensitive" } },
+        { direccion: { contains: q, mode: "insensitive" } },
+        { telefono: { contains: q, mode: "insensitive" } },
+        { notas: { contains: q, mode: "insensitive" } },
+        { redesSociales: { contains: q, mode: "insensitive" } },
       ];
     }
 
