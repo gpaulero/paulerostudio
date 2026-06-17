@@ -15,27 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Paulero Studio | Diseño & Desarrollo Web",
+  title: "CRM Prospeción · Paulero Studio",
   description:
-    "Estudio de diseño y desarrollo web. Sitios rápidos, hermosos y funcionales. E-commerce, backends robustos y experiencias digitales que convierten.",
-  keywords: [
-    "desarrollo web",
-    "diseño web",
-    "e-commerce",
-    "Paulero Studio",
-    "Gonzalo Paulero",
-    "tienda online",
-    "backend",
-  ],
+    "CRM de prospección comercial para Paulero Studio — gestión de comercios y leads del Valle de Punilla y región.",
   authors: [{ name: "Gonzalo Paulero" }],
   icons: {
     icon: "/logo-mark.png",
-  },
-  openGraph: {
-    title: "Paulero Studio | Diseño & Desarrollo Web",
-    description:
-      "Estudio de diseño y desarrollo web. Sitios rápidos, hermosos y funcionales.",
-    type: "website",
   },
 };
 
@@ -45,14 +30,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className="dark">
+    <html lang="es" suppressHydrationWarning className="light">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange={false}
         >
           {children}

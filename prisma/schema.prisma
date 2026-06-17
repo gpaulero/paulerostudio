@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema — CRM de prospección Paulero Studio
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +9,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Comercio / lead prospectado
+model Comercio {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  nombre      String
+  rubro       String   // Concesionaria, Hotel, Restaurante, Tienda, Inmobiliaria, etc.
+  zona        String   // Carlos Paz, La Falda, Valle Hermoso, Cosquín, Capilla del Monte, La Cumbre, etc.
+  direccion   String?
+  telefono    String?  // formato libre, ej: (3541) 206969
+  whatsapp    String?  // formato E.164 sin +, ej: 5493541206969
+  email       String?
+  webUrl      String?
+  redesSociales String? // texto libre
+  estadoWeb   String?  // Sin web / Amateur / Obsoleta / Decente
+  prioridad   String   @default("Alta") // Alta / Media / Baja
+
+  // Estado de contacto en el pipeline de ventas
+  estado      String   @default("Sin contactar")
+  // Valores posibles:
+  // - Sin contactar
+  // - Contactado
+  // - Respondio
+  // - Reunion
+  // - Cerrado
+  // - Rechazado
+
+  notas       String?  // nota interna libre
+  pitchSugerido String? // qué ofrecerle
+  proximaAccion String? // qué hacer después
+  fechaProximaAccion DateTime?
+
+  seguimientos Seguimiento[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Historial de seguimientos por comercio
+model Seguimiento {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  comercioId String
+  comercio   Comercio @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+
+  tipo       String   // nota / llamada / whatsapp / email / reunion / cierre
+  contenido  String   // texto libre
+  resultado  String?  // ej: "respondio", "no contesto", "agendo reunion"
 }

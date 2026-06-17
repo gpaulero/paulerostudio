@@ -128,3 +128,57 @@ Stage Summary:
 - E-commerce monthly fee clarified across entire site
 - Currency selector with 8 Latam currencies + real-time rates
 - All changes committed and pushed, live on Vercel
+
+---
+Task ID: 13
+Agent: main (Super Z)
+Task: CRM de prospección web con relevamiento precargado + verificable en browser
+
+Work Log:
+- Prisma schema actualizado con 2 modelos: Comercio + Seguimiento (con onDelete cascade)
+- Modelo Comercio: nombre, rubro, zona, direccion, telefono, whatsapp, email, webUrl, redesSociales, estadoWeb, prioridad, estado, notas, pitchSugerido, proximaAccion, fechaProximaAccion
+- Modelo Seguimiento: tipo (nota/whatsapp/llamada/email/reunion/cierre), contenido, resultado
+- 5 estados: Sin contactar → Contactado → Respondio → Reunion → Cerrado / Rechazado
+- API CRUD completa:
+  - GET/POST /api/comercios (con filtros rubro/zona/estado/prioridad/q)
+  - GET/PATCH/DELETE /api/comercios/[id]
+  - POST /api/comercios/[id]/seguimientos (con opcion cambiarEstadoA)
+  - POST /api/comercios/seed (precarga 32 concesionarias)
+- UI completa (3 componentes):
+  - dashboard.tsx: 6 cards con métricas (total, sin contactar, en proceso, cerrados, tasa de cierre, prioridad alta)
+  - comercios-table.tsx: tabla con badge de estado (6 colores), badge de prioridad, botones WhatsApp/web/teléfono en cada fila
+  - comercio-modal.tsx: 3 tabs (Info / Seguimiento / Editar), cambio rápido de estado, historial con timestamps
+  - nuevo-comercio-modal.tsx: form completo con datalists para rubro/zona/estado web
+- Extracción inteligente de WhatsApp: convierte "(3541) 206969" o "WhatsApp 351 242 9960" a E.164 (54 + 9 + area + num)
+- Layout cambiado de dark a light para mejor legibilidad del CRM
+- Metadata del layout actualizada
+- Botón "Cargar relevamiento" precarga 32 concesionarias del Valle de Punilla (idempotente)
+- Verificación con agent-browser:
+  - Página carga OK (sin errores de hydration)
+  - Click en "Cargar relevamiento" → 32 comercios cargados
+  - Tabla muestra todos con badges de estado y prioridad
+  - Click en fila → modal se abre
+  - Click en "Contactado" → estado cambia y se refleja en tabla
+  - Tab Seguimiento → fill textarea + click Agregar → seguimiento guardado, tab actualizado a "(1)"
+
+Key Files:
+- prisma/schema.prisma — modelos Comercio + Seguimiento
+- src/app/api/comercios/route.ts — GET (con filtros) + POST
+- src/app/api/comercios/[id]/route.ts — GET + PATCH + DELETE
+- src/app/api/comercios/[id]/seguimientos/route.ts — POST seguimiento
+- src/app/api/comercios/seed/route.ts — Precarga 32 concesionarias
+- src/app/page.tsx — UI principal del CRM con filtros y dashboard
+- src/components/crm/dashboard.tsx — 6 KPIs
+- src/components/crm/comercios-table.tsx — Tabla con badges y acciones
+- src/components/crm/comercio-modal.tsx — Modal 3 tabs (Info/Seguimiento/Editar)
+- src/components/crm/nuevo-comercio-modal.tsx — Form alta comercio
+- src/components/crm/icons.tsx — Iconos custom (WhatsApp, MapPin, etc.)
+
+Stage Summary:
+- CRM funcional y verificado end-to-end con agent-browser
+- 32 comercios precargados (relevamiento Valle de Punilla)
+- Filtros por rubro, zona, estado, prioridad + búsqueda free-text
+- Dashboard con métricas en tiempo real
+- Modal con cambio rápido de estado + historial de seguimientos
+- Botón directo a WhatsApp/teléfono/web de cada comercio
+- Diseño responsive (mobile-first), light theme, emerald accent
