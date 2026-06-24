@@ -1,0 +1,73 @@
+{
+  "_comentario": "Configuración de prospección automática para n8n. Editá este archivo para agregar rubros o zonas — el workflow de n8n lo lee automáticamente cada vez que corre. No hace falta tocar el workflow.",
+  "_fuentes": {
+    "google_maps": "Apify Google Maps scraper (mejor cobertura, ~5 USD cada 1000 resultados)",
+    "web_search_llm": "Búsqueda web + extracción con LLM (gratis, menor cobertura)",
+    "instagram": "Apify Instagram scraper (hashtags por ubicación)",
+    "facebook": "Apify Facebook Pages scraper (páginas de comercios)",
+    "directorio_ar": "Páginas Amarillas Argentina + InfoisInfo (gratis, scraping HTML)"
+  },
+  "schedule": {
+    "dias": ["Lun", "Mie", "Vie"],
+    "hora": "09:00",
+    "timezone": "America/Argentina/Cordoba"
+  },
+  "rubros": [
+    {
+      "nombre": "Concesionaria",
+      "apify_searchTerms_template": "concesionaria {zona} Córdoba",
+      "instagram_hashtags_template": ["concesionaria{zona_limpio}"],
+      "pitch_default": "Web profesional con catálogo de vehículos, financación online y captura de leads."
+    },
+    {
+      "nombre": "Hotel",
+      "apify_searchTerms_template": "hotel {zona} Córdoba",
+      "instagram_hashtags_template": ["hotel{zona_limpio}", "{zona_limpio}hotel"],
+      "pitch_default": "Web con reservas online, galería de habitaciones y sincronización con Booking/Airbnb."
+    },
+    {
+      "nombre": "Restaurante",
+      "apify_searchTerms_template": "restaurante {zona} Córdoba",
+      "instagram_hashtags_template": ["restaurante{zona_limpio}", "{zona_limpio}food"],
+      "pitch_default": "Web con menú digital, reservas online y fotos profesionales de platos."
+    },
+    {
+      "nombre": "Inmobiliaria",
+      "apify_searchTerms_template": "inmobiliaria {zona} Córdoba",
+      "instagram_hashtags_template": ["inmobiliaria{zona_limpio}"],
+      "pitch_default": "Web con buscador de propiedades, filtros y captura de leads calificados."
+    }
+  ],
+  "zonas": [
+    { "nombre": "La Falda", "provincia": "Córdoba", "prioridad": "Alta" },
+    { "nombre": "Cosquín", "provincia": "Córdoba", "prioridad": "Alta" },
+    { "nombre": "Villa Carlos Paz", "provincia": "Córdoba", "prioridad": "Alta" },
+    { "nombre": "Capilla del Monte", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "La Cumbre", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "Valle Hermoso", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "Tanti", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "Bialet Massé", "provincia": "Córdoba", "prioridad": "Baja" },
+    { "nombre": "Córdoba Capital", "provincia": "Córdoba", "prioridad": "Alta" },
+    { "nombre": "Río Cuarto", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "Villa María", "provincia": "Córdoba", "prioridad": "Media" },
+    { "nombre": "Rosario", "provincia": "Santa Fe", "prioridad": "Media" },
+    { "nombre": "Mendoza Capital", "provincia": "Mendoza", "prioridad": "Media" },
+    { "nombre": "Buenos Aires (CABA)", "provincia": "Buenos Aires", "prioridad": "Baja" }
+  ],
+  "filtro_calidad": {
+    "min_palabras_nombre": 2,
+    "excluir_nombres": [
+      "directory", "directorio", "listado", "guía", "guia",
+      "google maps", "wikipedia", "facebook", "instagram"
+    ],
+    "excluir_dominios": [
+      "facebook.com", "instagram.com", "google.com", "youtube.com",
+      "wikipedia.org", "yelp.com", "tripadvisor.com", "infoisinfo.com.ar",
+      "paginasamarillas.com.ar", "guia-telefonica.com.ar"
+    ]
+  },
+  "telegram": {
+    "notificar_solo_prioridad": ["Alta"],
+    "mensaje_inicial": "🚀 <b>{total} nuevos leads</b> de prospección automática ({fecha})\n\nSolo te muestro los de <b>prioridad alta</b> (sin web propia o amateur).\nAbordalos por WhatsApp con el pitch sugerido."
+  }
+}
