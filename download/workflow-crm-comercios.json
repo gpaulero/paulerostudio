@@ -1,0 +1,240 @@
+{
+  "name": "CRM Comercios - Buscador por Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "1a2b3c4d-0001-4000-8000-000000000001",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "telegram-comercios-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.message?.text || '';\nconst chatId = $input.first().json.message?.chat?.id;\n\nif (!text.startsWith('/buscar')) {\n  return [{\n    json: {\n      _skip: true,\n      chatId,\n      reply: 'Usa el comando /buscar seguido del termino.\\n\\nEjemplo:\\n/buscar restaurant palermo\\n/buscar ferreteria 20'\n    }\n  }];\n}\n\nconst parts = text.replace('/buscar', '').trim().split(/\\s+/);\nconst termino = parts[0] || '';\nconst zona = parts[1] && !/^\\d+$/.test(parts[1]) ? parts[1] : '';\nconst limite = parts.find(p => /^\\d+$/.test(p)) || '10';\n\nreturn [{\n  json: {\n    _skip: false,\n    chatId,\n    termino,\n    zona,\n    limite: parseInt(limite, 10),\n    raw: text\n  }\n}];"
+      },
+      "id": "1a2b3c4d-0002-4000-8000-000000000002",
+      "name": "Parsear comando",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-skip",
+              "leftValue": "={{ $json._skip }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1a2b3c4d-0003-4000-8000-000000000003",
+      "name": "Es comando valido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.CRM_BASE_URL }}/api/comercios/buscar-online",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.termino }}"
+            },
+            {
+              "name": "zona",
+              "value": "={{ $json.zona }}"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $json.limite }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.CRM_API_TOKEN }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "1a2b3c4d-0004-4000-8000-000000000004",
+      "name": "Buscar en CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        220
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst chatId = $('Parsear comando').first().json.chatId;\n\nlet comercios = [];\nif (Array.isArray(input)) {\n  comercios = input;\n} else if (Array.isArray(input?.data)) {\n  comercios = input.data;\n} else if (Array.isArray(input?.results)) {\n  comercios = input.results;\n} else if (Array.isArray(input?.comercios)) {\n  comercios = input.comercios;\n} else if (input && typeof input === 'object') {\n  comercios = [input];\n}\n\nif (comercios.length === 0) {\n  return [{\n    json: {\n      chatId,\n      text: 'No se encontraron comercios para tu busqueda.'\n    }\n  }];\n}\n\nconst lines = comercios.map((c, i) => {\n  const nombre = c.nombre || c.name || c.razon_social || 'Sin nombre';\n  const rubro = c.rubro || c.categoria || c.category || '';\n  const zona = c.zona || c.barrio || c.ciudad || '';\n  const tel = c.telefono || c.phone || c.whatsapp || '';\n  const dir = c.direccion || c.address || '';\n  const web = c.web || c.website || c.url || '';\n\n  let line = (i + 1) + '. *' + nombre + '*';\n  if (rubro) line += '\\\\n   Rubro: ' + rubro;\n  if (zona) line += '\\\\n   Zona: ' + zona;\n  if (dir) line += '\\\\n   Direccion: ' + dir;\n  if (tel) line += '\\\\n   Tel: ' + tel;\n  if (web) line += '\\\\n   Web: ' + web;\n  return line;\n});\n\nconst header = '*' + comercios.length + ' resultado(s) encontrados*\\\\n\\\\n';\nconst text = header + lines.join('\\\\n\\\\n');\n\nreturn [{\n  json: {\n    chatId,\n    text\n  }\n}];"
+      },
+      "id": "1a2b3c4d-0005-4000-8000-000000000005",
+      "name": "Formatear respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "parseMode": "Markdown",
+          "disableWebPagePreview": true
+        }
+      },
+      "id": "1a2b3c4d-0006-4000-8000-000000000006",
+      "name": "Enviar resultados",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1380,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.reply }}",
+        "additionalFields": {}
+      },
+      "id": "1a2b3c4d-0007-4000-8000-000000000007",
+      "name": "Enviar ayuda",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parsear comando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear comando": {
+      "main": [
+        [
+          {
+            "node": "Es comando valido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es comando valido?": {
+      "main": [
+        [
+          {
+            "node": "Buscar en CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar ayuda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en CRM": {
+      "main": [
+        [
+          {
+            "node": "Formatear respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear respuesta": {
+      "main": [
+        [
+          {
+            "node": "Enviar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
