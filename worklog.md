@@ -223,3 +223,64 @@ Stage Summary:
 - Filtros del CRM se actualizan solos para mostrar los rubros nuevos (Hotel, Restaurante, Inmobiliaria ya aparecen como opciones).
 - Archivos creados: src/app/api/comercios/buscar-online/route.ts, src/components/crm/buscar-online-modal.tsx.
 - Archivos modificados: src/app/page.tsx.
+
+---
+Task ID: n8n-telegram-crm
+Agent: main (Super Z)
+Task: Configurar bot de Telegram con n8n que consulta al CRM de comercios
+
+Contexto y antecedentes:
+- Usuario tiene un CRM con endpoint /api/comercios/buscar-online ya funcionando
+- Usuario eligió Opción 3: automatización real con n8n self-hosted (corre en su compu)
+- n8n ya está corriendo en su compu con Docker
+- Bot de Telegram ya creado y conectado en n8n
+
+Work Log:
+- Generé archivo de workflow n8n en /home/z/my-project/download/workflow-crm-comercios.json
+  - 7 nodos: Telegram Trigger, Parsear comando, Es comando valido?, Buscar en CRM,
+    Formatear respuesta, Enviar resultados, Enviar ayuda
+  - Usa variables $env.CRM_BASE_URL y $env.CRM_API_TOKEN
+  - Comando esperado: /buscar <termino> [zona] [limite]
+  - Formatea respuesta con Markdown para Telegram
+  - Soporta varios formatos de respuesta del CRM (data, results, comercios, array directo)
+- Validé el JSON del workflow (7 nodos, conexiones correctas)
+- Usuario importó el workflow OK
+- Usuario reportó error: "access to env vars denied" en nodo 'Cargar Config Rubros/Zonas'
+- Expliqué 3 soluciones:
+  1. N8N_BLOCK_ENV_ACCESS_IN_NODE=false en docker-compose.yml (recomendada)
+  2. Usar $vars internas de n8n en lugar de $env
+  3. Hardcodear valores en el Code node
+- Armé tutorial completo paso a paso con:
+  - Cómo editar docker-compose.yml
+  - Cómo verificar credenciales
+  - Cómo activar y probar el workflow
+  - Tabla de errores comunes y soluciones
+  - Tips de mantenimiento y backup
+
+PENDIENTES PARA MAÑANA (usuario continúa):
+- Confirmar si aplicó Solución 1 (docker-compose) o Solución 2 ($vars)
+- Verificar que el nodo "Cargar Config Rubros/Zonas" ejecuta sin error
+- Confirmar valores reales de CRM_BASE_URL y CRM_API_TOKEN (usuario todavía no los pasó)
+- Verificar la estructura real de la respuesta del endpoint /api/comercios/buscar-online
+  (puede que los campos no se llamen nombre/rubro/zona/telefono/direccion/web y haya
+   que ajustar el nodo "Formatear respuesta")
+- Probar el bot enviando /buscar restaurant palermo desde Telegram
+- Debuggear si aparece algún error nuevo (tabla de errores comunes en el tutorial)
+- Si usuario quiere, armar script de verificación que chequee todo de una
+
+Archivos generados:
+- /home/z/my-project/download/workflow-crm-comercios.json (workflow n8n listo para importar)
+
+Notas técnicas:
+- n8n corre en Docker en la compu del usuario
+- Zona horaria configurada: America/Buenos_Aires
+- El endpoint del CRM espera: q (query), zona, limit
+- Auth del CRM: Bearer token en header Authorization
+- Bot de Telegram conectado vía Telegram Trigger (n8n-nodes-base.telegramTrigger v1.1)
+- Workflow activo = escucha mensajes de Telegram incluso con navegador cerrado
+
+Stage Summary:
+- Workflow generado, importado y validado
+- Pendiente resolver error de env vars (usuario decide entre docker-compose o $vars)
+- Pendiente probar el flujo completo end-to-end desde Telegram
+- Usuario retoma mañana
