@@ -28,6 +28,81 @@ WA_MESSAGE_TEMPLATE = (
 )
 
 # ──────────────────────────────────────────────────────────────
+# Biblioteca de pitches por rubro
+# ──────────────────────────────────────────────────────────────
+
+PITCHES_POR_RUBRO = {
+    "Hotel": (
+        "Hola {nombre}! Vi que están en {zona}. Soy Gonzalo de Paulero Studio, "
+        "desarrollo webs para hoteles. Te propongo una web con reservas online "
+        "propias, sincronización con Booking/Airbnb y galería profesional de "
+        "habitaciones. ¿Tenés 5 minutos esta semana para una llamada?"
+    ),
+    "Restaurante": (
+        "Hola {nombre}! Vi su restaurante en {zona}. Soy Gonzalo de Paulero "
+        "Studio. Te propongo una web con menú digital QR, reservas online y "
+        "fotos profesionales que venden más platos. ¿Les interesaría ver una "
+        "demostración?"
+    ),
+    "Inmobiliaria": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su inmobiliaria en "
+        "{zona} y les propongo una web con buscador de propiedades, filtros "
+        "por precio/zona/tipo y captura automática de leads calificados. "
+        "¿Tenés 10 minutos esta semana?"
+    ),
+    "Concesionaria": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su concesionaria en "
+        "{zona} y les propongo una web profesional con catálogo de vehículos, "
+        "simulador de financiación online y captura de leads. ¿Les interesaría "
+        "ver un demo?"
+    ),
+    "Veterinaria": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su veterinaria en "
+        "{zona} y les propongo una web con turnos online, historias clínicas "
+        "digitales y tienda de alimentos. ¿Les interesaría charlar?"
+    ),
+    "Gimnasio": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su gimnasio en "
+        "{zona} y les propongo una web con inscripción online, planilla de "
+        "rutinas por alumno y pagos mensuales automáticos. ¿10 minutos esta "
+        "semana?"
+    ),
+    "Panadería": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su panadería en "
+        "{zona} y les propongo una web con catálogo de productos, pedidos "
+        "online para retiro en tienda y WhatsApp integrado. ¿Charlamos?"
+    ),
+    "Peluquería": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su peluquería en "
+        "{zona} y les propongo una web con reserva de turnos online, galería "
+        "de trabajos y captura de clientes nuevos por Instagram. ¿Les "
+        "interesaría?"
+    ),
+    "Clínica Dental": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su clínica dental "
+        "en {zona} y les propongo una web con turnos online, antes/después "
+        "de tratamientos y captación de pacientes por Google. ¿Charlamos?"
+    ),
+    "Tienda de Ropa": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su tienda en {zona} "
+        "y les propongo una web con catálogo online, WhatsApp integrado y "
+        "venta por Instagram. ¿10 minutos esta semana?"
+    ),
+    "default": (
+        "Hola {nombre}! Soy Gonzalo de Paulero Studio, desarrollo webs "
+        "profesionales para comercios en {zona}. ¿Les interesaría ver una "
+        "propuesta para tener presencia online profesional? 10 minutos esta "
+        "semana, sin compromiso."
+    ),
+}
+
+
+def get_pitch(rubro: str, nombre: str, zona: str) -> str:
+    """Devuelve el pitch personalizado para el rubro."""
+    plantilla = PITCHES_POR_RUBRO.get(rubro, PITCHES_POR_RUBRO["default"])
+    return plantilla.format(nombre=nombre, zona=zona)
+
+# ──────────────────────────────────────────────────────────────
 # Helpers
 # ──────────────────────────────────────────────────────────────
 
@@ -75,8 +150,8 @@ def inferir_prioridad(estado_web: str) -> str:
     return "Baja"
 
 
-def construir_whatsapp_link(telefono: Optional[str], whatsapp: Optional[str], nombre: str) -> Optional[str]:
-    """Construye un deep link de WhatsApp con mensaje pre-escrito."""
+def construir_whatsapp_link(telefono: Optional[str], whatsapp: Optional[str], nombre: str, rubro: str = "", zona: str = "") -> Optional[str]:
+    """Construye un deep link de WhatsApp con pitch pre-escrito según rubro."""
     digits = ""
     if whatsapp:
         digits = re.sub(r"\D", "", whatsapp)
@@ -93,7 +168,11 @@ def construir_whatsapp_link(telefono: Optional[str], whatsapp: Optional[str], no
     if len(digits) < 7:
         return None
 
-    msg = WA_MESSAGE_TEMPLATE.format(nombre=nombre)
+    # Usar pitch personalizado si hay rubro, sino template genérico
+    if rubro and zona:
+        msg = get_pitch(rubro, nombre, zona)
+    else:
+        msg = WA_MESSAGE_TEMPLATE.format(nombre=nombre)
     return f"https://wa.me/{digits}?text={urllib.parse.quote(msg)}"
 
 
@@ -227,48 +306,80 @@ Devolvé EXCLUSIVAMENTE un JSON válido con esta forma, sin markdown ni explicac
 Extraé todos los comercios reales que encuentres. Devolvé solo JSON."""
 
     print(f"  → LLM: extrayendo comercios de {len(candidatos)} candidatos...")
-    try:
-        # z-ai chat CLI: guarda output en archivo para parsear JSON
-        import tempfile
-        with tempfile.NamedTemporaryFile(mode="w+", suffix=".json", delete=False) as tmp:
-            tmp_path = tmp.name
+    import tempfile
+    max_intentos = 3
+    for intento in range(1, max_intentos + 1):
+        try:
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".json", delete=False) as tmp:
+                tmp_path = tmp.name
 
-        result = subprocess.run(
-            [
-                "z-ai", "chat",
-                "--system", system_prompt,
-                "--prompt", user_prompt,
-                "--output", tmp_path,
-            ],
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
-        if result.returncode != 0:
-            print(f"  ⚠️ LLM falló: {result.stderr[:200]}", file=sys.stderr)
-            return []
+            result = subprocess.run(
+                [
+                    "z-ai", "chat",
+                    "--system", system_prompt,
+                    "--prompt", user_prompt,
+                    "--output", tmp_path,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            if result.returncode != 0:
+                print(f"  ⚠️ LLM intento {intento}/{max_intentos} falló: {result.stderr[:150]}", file=sys.stderr)
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+                if intento < max_intentos:
+                    import time as _t
+                    _t.sleep(5 * intento)  # backoff
+                continue
 
-        with open(tmp_path, "r") as f:
-            chat_resp = json.load(f)
+            with open(tmp_path, "r") as f:
+                chat_resp = json.load(f)
+            os.unlink(tmp_path)
 
-        os.unlink(tmp_path)
+            content = (chat_resp.get("choices", [{}])[0].get("message", {}).get("content", "")
+                       or chat_resp.get("content", "") or "")
 
-        content = (chat_resp.get("choices", [{}])[0].get("message", {}).get("content", "")
-                   or chat_resp.get("content", "") or "")
+            json_match = re.search(r"\{[\s\S]*\}", content)
+            if not json_match:
+                print(f"  ⚠️ LLM intento {intento} no devolvió JSON válido.", file=sys.stderr)
+                if intento < max_intentos:
+                    import time as _t
+                    _t.sleep(3)
+                continue
 
-        # Extraer JSON aunque venga con markdown
-        json_match = re.search(r"\{[\s\S]*\}", content)
-        if not json_match:
-            print(f"  ⚠️ LLM no devolvió JSON válido.", file=sys.stderr)
-            return []
+            parsed = json.loads(json_match.group(0))
+            comercios = parsed.get("comercios", [])
+            print(f"  ✓ LLM extrajo {len(comercios)} comercios (intento {intento}).")
+            return comercios
+        except Exception as e:
+            print(f"  ⚠️ LLM intento {intento} excepción: {e}", file=sys.stderr)
+            if intento < max_intentos:
+                import time as _t
+                _t.sleep(5 * intento)
 
-        parsed = json.loads(json_match.group(0))
-        comercios = parsed.get("comercios", [])
-        print(f"  ✓ LLM extrajo {len(comercios)} comercios.")
-        return comercios
-    except Exception as e:
-        print(f"  ⚠️ LLM falló: {e}", file=sys.stderr)
-        return []
+    # ── Fallback: si LLM falló todas las veces, generar leads simples ──
+    print(f"  → LLM falló. Generando leads simples desde resultados crudos...")
+    leads_simples = []
+    for r in candidatos:
+        nombre = (r.get("name") or "").strip()
+        if len(nombre) < 3:
+            continue
+        # Filtrar nombres que parecen artículos o listas
+        nombre_lower = nombre.lower()
+        if any(p in nombre_lower for p in ["hoteles en", "restaurantes en", "lista de", "mejores", "top 10", "guía", "guia"]):
+            continue
+        leads_simples.append({
+            "nombre": nombre,
+            "direccion": None,
+            "telefono": None,
+            "webUrl": r.get("url"),
+            "redesSociales": None,
+            "estadoWeb": None,  # se infiere después
+            "notas": (r.get("snippet") or "")[:200],
+        })
+    print(f"  ✓ Fallback: {len(leads_simples)} leads simples.")
+    return leads_simples
 
 
 # ──────────────────────────────────────────────────────────────
@@ -444,7 +555,14 @@ def enviar_leads_telegram(leads: list[dict], rubro: str, zona: str):
 
     # Un mensaje por lead accionable (alta primero, luego media)
     for i, lead in enumerate(accionables, 1):
-        wa_link = construir_whatsapp_link(lead.get("telefono"), lead.get("whatsapp"), lead["nombre"])
+        wa_link = construir_whatsapp_link(
+            lead.get("telefono"),
+            lead.get("whatsapp"),
+            lead["nombre"],
+            lead["rubro"],
+            lead["zona"],
+        )
+        pitch_texto = get_pitch(lead["rubro"], lead["nombre"], lead["zona"])
 
         emoji = "🔥" if lead["prioridad"] == "Alta" else "🟡"
 
@@ -463,11 +581,14 @@ def enviar_leads_telegram(leads: list[dict], rubro: str, zona: str):
         if lead.get("notas"):
             nota_corta = lead["notas"][:120] + ("…" if len(lead["notas"]) > 120 else "")
             msg += f"📝 {nota_corta}\n"
+        # Pitch sugerido (recortado para Telegram)
+        pitch_corto = pitch_texto if len(pitch_texto) <= 280 else pitch_texto[:277] + "…"
+        msg += f"\n💬 <i>Pitch sugerido:</i>\n{pitch_corto}\n"
         msg += "\n"
         if wa_link:
-            msg += f'🟢 <a href="{wa_link}">Abrir WhatsApp</a>'
+            msg += f'🟢 <a href="{wa_link}">Abrir WhatsApp con pitch listo</a>'
         else:
-            msg += "⚠️ Sin teléfono"
+            msg += "⚠️ Sin teléfono (buscalo en Google/Instagram)"
 
         send_telegram(msg)
         import time
