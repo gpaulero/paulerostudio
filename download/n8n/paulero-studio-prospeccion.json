@@ -1,0 +1,491 @@
+{
+  "name": "Prospección Automática Paulero Studio",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1,3,5"
+            }
+          ]
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000001",
+      "name": "Schedule Trigger (Lun/Mié/Vie 9am)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "notes": "Se ejecuta 3 veces por semana (Lunes, Miércoles, Viernes) a las 9 AM hora Argentina.\nConfigurable en public/n8n-config/prospeccion-config.json"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CRM_BASE_URL || 'http://localhost:3000' }}/n8n-config/prospeccion-config.json",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000002",
+      "name": "Cargar Config Rubros/Zonas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "notes": "Descarga el JSON de configuración desde el CRM.\nPara cambiar rubros/zonas, editá public/n8n-config/prospeccion-config.json en el repo del CRM."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Genera todas las combinaciones rubro×zona a partir de la config.\n// Devuelve un array de items, uno por cada par (rubro, zona).\n\nconst config = $input.first().json;\nconst items = [];\n\nfor (const rubro of config.rubros || []) {\n  for (const zona of config.zonas || []) {\n    items.push({\n      json: {\n        rubro: rubro.nombre,\n        zona: zona.nombre,\n        provincia: zona.provincia,\n        prioridad_zona: zona.prioridad,\n        apify_searchTerm: rubro.apify_searchTerms_template\n          .replace('{zona}', zona.nombre),\n        instagram_hashtags: (rubro.instagram_hashtags_template || [])\n          .map(h => h.replace('{zona_limpio}', zona.nombre.toLowerCase().replace(/\\s+/g, ''))),\n        pitch_default: rubro.pitch_default,\n        config_completa: config\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "id": "1a000000-0000-0000-0000-000000000003",
+      "name": "Generar Combinaciones Rubro×Zona",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000004",
+      "name": "Loop (1 rubro×zona por vez)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [660, 0]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~google-maps-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "token", "value": "={{$env.APIFY_API_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"searchStringsArray\": [\"{{ $json.apify_searchTerm }}\"],\n  \"maxCrawledPlacesPerSearch\": 15,\n  \"language\": \"es\",\n  \"countryCode\": \"ar\",\n  \"extractContactDetails\": true,\n  \"extractReviews\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000010",
+      "name": "Google Maps (Apify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -300],
+      "notes": "Scraper de Google Maps vía Apify.\nRequiere APIFY_API_TOKEN en n8n environment.\nCosto: ~0.025 USD por resultado (gratis los primeros 5 USD del trial)."
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_BASE_URL || 'http://localhost:3000' }}/api/comercios/buscar-online",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"rubro\": \"{{ $json.rubro }}\",\n  \"zona\": \"{{ $json.zona }}\"\n}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000011",
+      "name": "Web Search + LLM (CRM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -100],
+      "notes": "Usa el endpoint existente del CRM que ya hace web_search + extracción con LLM.\nGratis (usa z-ai-web-dev-sdk internamente)."
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "token", "value": "={{$env.APIFY_API_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"hashtags\": {{ JSON.stringify($json.instagram_hashtags) }},\n  \"resultsLimit\": 20\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000012",
+      "name": "Instagram (Apify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 100],
+      "notes": "Hashtag scraper de Instagram vía Apify.\nRequiere APIFY_API_TOKEN.\nÚtil para descubrir comercios jóvenes que no aparecen en Google."
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~facebook-pages-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "token", "value": "={{$env.APIFY_API_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"startUrls\": [{\n    \"url\": \"https://www.facebook.com/search/pages?q={{ encodeURIComponent($json.rubro + ' ' + $json.zona) }}\"\n  }],\n  \"maxResults\": 15\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000013",
+      "name": "Facebook Pages (Apify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300],
+      "notes": "Scraper de Facebook Pages vía Apify.\nRequiere APIFY_API_TOKEN.\nÚtil para comercios que solo tienen presencia en Facebook (sin web propia)."
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.paginasamarillas.com.ar/buscador?q={{{encodeURIComponent($json.rubro)}}}&l={{{encodeURIComponent($json.zona)}}}",
+        "responseFormat": "text",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000014",
+      "name": "Páginas Amarillas AR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 500],
+      "notes": "Scraping HTML de Páginas Amarillas Argentina.\nGratis (sin API key).\nLuego un Code node extrae nombre, dirección y teléfono del HTML."
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Convierte el HTML de Páginas Amarillas a leads estructurados\nconst html = $input.first().json.data || '';\nconst leads = [];\n\n// Patrones de Páginas Amarillas AR (pueden cambiar, mantener actualizado)\nconst nombreMatches = [...html.matchAll(/<a[^>]*class=\"[^\"]*business-name[^\"]*\"[^>]*>([^<]+)<\\/a>/g)];\nconst dirMatches = [...html.matchAll(/<span[^>]*class=\"[^\"]*address[^\"]*\"[^>]*>([^<]+)<\\/span>/g)];\nconst telMatches = [...html.matchAll(/data-phone=\"([^\"]+)\"/g)];\n\nfor (let i = 0; i < Math.min(nombreMatches.length, 20); i++) {\n  const nombre = nombreMatches[i][1].trim();\n  if (nombre.length < 3) continue;\n  leads.push({\n    nombre,\n    direccion: dirMatches[i] ? dirMatches[i][1].trim() : null,\n    telefono: telMatches[i] ? telMatches[i][1].trim() : null,\n    fuente: 'directorio_ar',\n    webUrl: null\n  });\n}\n\nreturn leads.length > 0 ? leads.map(l => ({ json: l })) : [{ json: { skip: true, fuente: 'directorio_ar' } }];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000015",
+      "name": "Parsear Páginas Amarillas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 500]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Normaliza los leads que vienen de Google Maps (Apify)\n// Input: array de lugares de Google Maps\nconst items = $input.all();\nconst leads = [];\n\nfor (const item of items) {\n  const p = item.json;\n  \n  // Saltar si no tiene nombre o si es un resultado vacío\n  if (!p.title || p.title.length < 3) continue;\n  \n  // Construir WhatsApp E.164 desde phone\n  let whatsapp = null;\n  if (p.phone) {\n    const digits = p.phone.replace(/\\D/g, '');\n    if (digits.startsWith('54')) {\n      whatsapp = digits;\n    } else if (digits.length === 10 && digits.startsWith('0')) {\n      whatsapp = '549' + digits.substring(1);\n    } else if (digits.length === 10) {\n      whatsapp = '549' + digits;\n    } else if (digits.length === 8 || digits.length === 7) {\n      whatsapp = '54935' + digits; // asumir Córdoba\n    }\n  }\n  \n  leads.push({\n    json: {\n      nombre: p.title,\n      rubro: $('Generar Combinaciones Rubro×Zona').item.json.rubro,\n      zona: $('Generar Combinaciones Rubro×Zona').item.json.zona,\n      direccion: p.address || p.location?.address || null,\n      telefono: p.phone || null,\n      whatsapp,\n      email: p.email || null,\n      webUrl: p.website || null,\n      redesSociales: [\n        p.facebook ? `FB: ${p.facebook}` : null,\n        p.instagram ? `IG: ${p.instagram}` : null,\n        p.twitter ? `TW: ${p.twitter}` : null\n      ].filter(Boolean).join(' | ') || null,\n      estadoWeb: null, // se infiere en el CRM\n      prioridad: null,\n      fuente: 'google_maps',\n      notas: p.categoryName ? `Categoría Google: ${p.categoryName}` : null,\n      pitchSugerido: $('Generar Combinaciones Rubro×Zona').item.json.pitch_default\n    }\n  });\n}\n\nreturn leads.length > 0 ? leads : [{ json: { skip: true, fuente: 'google_maps' } }];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000020",
+      "name": "Normalizar Google Maps → Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, -300]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Convierte la respuesta del endpoint buscar-online del CRM\n// a leads normalizados para el siguiente paso.\nconst resp = $input.first().json;\nconst rubro = $('Generar Combinaciones Rubro×Zona').item.json.rubro;\nconst zona = $('Generar Combinaciones Rubro×Zona').item.json.zona;\nconst pitch = $('Generar Combinaciones Rubro×Zona').item.json.pitch_default;\n\n// El endpoint ya creó los comercios en el CRM, pero igualmente\n// los emitimos para que aparezcan en el reporte de Telegram.\nconst nuevos = resp.nuevos || [];\n\nif (nuevos.length === 0) {\n  return [{ json: { skip: true, fuente: 'web_search' } }];\n}\n\n// Como los leads ya se guardaron en el CRM (via el endpoint interno),\n// acá solo armamos el objeto para el reporte de Telegram.\nreturn nuevos.map(n => ({\n  json: {\n    id_crm: n.id,\n    nombre: n.nombre,\n    rubro,\n    zona,\n    webUrl: n.webUrl || null,\n    fuente: 'web_search',\n    ya_en_crm: true,\n    pitchSugerido: pitch\n  }\n}));"
+      },
+      "id": "1a000000-0000-0000-0000-000000000021",
+      "name": "Normalizar Web Search → Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, -100]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Convierte resultados de Instagram (posts por hashtag) en leads.\n// Cada post puede pertenecer a un comercio diferente — agrupamos por ownerUsername.\nconst items = $input.all();\nconst rubro = $('Generar Combinaciones Rubro×Zona').item.json.rubro;\nconst zona = $('Generar Combinaciones Rubro×Zona').item.json.zona;\nconst pitch = $('Generar Combinaciones Rubro×Zona').item.json.pitch_default;\n\nconst comerciosPorOwner = {};\nfor (const item of items) {\n  const p = item.json;\n  const owner = p.ownerUsername || p.shortCode;\n  if (!owner) continue;\n  if (!comerciosPorOwner[owner]) {\n    comerciosPorOwner[owner] = {\n      nombre: p.ownerUsername || owner,\n      rubro,\n      zona,\n      direccion: null,\n      telefono: null,\n      whatsapp: null,\n      email: null,\n      webUrl: p.url || null,\n      redesSociales: `IG: @${p.ownerUsername}`,\n      estadoWeb: 'Sin web (solo red social)',\n      prioridad: 'Alta',\n      fuente: 'instagram',\n      notas: `Hashtag: ${p.hashtag || 'n/a'}, ${p.likes || 0} likes en último post`,\n      pitchSugerido: pitch\n    };\n  }\n}\n\nconst leads = Object.values(comerciosPorOwner);\nreturn leads.length > 0 ? leads.map(l => ({ json: l })) : [{ json: { skip: true, fuente: 'instagram' } }];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000022",
+      "name": "Normalizar Instagram → Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 100]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Convierte páginas de Facebook scrapeadas a leads.\nconst items = $input.all();\nconst rubro = $('Generar Combinaciones Rubro×Zona').item.json.rubro;\nconst zona = $('Generar Combinaciones Rubro×Zona').item.json.zona;\nconst pitch = $('Generar Combinaciones Rubro×Zona').item.json.pitch_default;\n\nconst leads = [];\nfor (const item of items) {\n  const p = item.json;\n  if (!p.name || p.name.length < 3) continue;\n  \n  leads.push({\n    json: {\n      nombre: p.name,\n      rubro,\n      zona,\n      direccion: p.address || p.location?.street || null,\n      telefono: p.phone || null,\n      whatsapp: p.phone ? p.phone.replace(/\\D/g, '') : null,\n      email: p.email || null,\n      webUrl: p.website || null,\n      redesSociales: `FB: ${p.name}${p.instagram ? ' | IG: ' + p.instagram : ''}`,\n      estadoWeb: p.website ? null : 'Sin web (solo red social)',\n      prioridad: p.website ? null : 'Alta',\n      fuente: 'facebook',\n      notas: p.about ? `About: ${p.about.substring(0, 200)}` : null,\n      pitchSugerido: pitch\n    }\n  });\n}\n\nreturn leads.length > 0 ? leads : [{ json: { skip: true, fuente: 'facebook' } }];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000023",
+      "name": "Normalizar Facebook → Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 300]
+    },
+
+    {
+      "parameters": {},
+      "id": "1a000000-0000-0000-0000-000000000030",
+      "name": "Merge Todas las Fuentes",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1540, 0],
+      "notes": "Combina los leads de las 5 fuentes en un único stream."
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Filtra leads inválidos y aplica las reglas de calidad de la config.\n// También dedupliquea dentro del mismo lote (por nombre normalizado).\nconst items = $input.all();\nconst config = $('Generar Combinaciones Rubro×Zona').item.json.config_completa;\nconst filtro = config.filtro_calidad || {};\nconst excluirNombres = (filtro.excluir_nombres || []).map(s => s.toLowerCase());\nconst excluirDominios = (filtro.excluir_dominios || []).map(s => s.toLowerCase());\n\nfunction normalizeName(s) {\n  return (s || '').toLowerCase()\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^a-z0-9]/g, '').trim();\n}\n\nconst vistos = new Set();\nconst leads = [];\n\nfor (const item of items) {\n  const l = item.json;\n  if (l.skip) continue;\n  if (!l.nombre || l.nombre.length < 3) continue;\n  \n  const nombreLower = l.nombre.toLowerCase();\n  if (excluirNombres.some(ex => nombreLower.includes(ex))) continue;\n  \n  if (l.webUrl) {\n    const hostMatch = l.webUrl.toLowerCase().match(/https?:\\/\\/([^/]+)/);\n    if (hostMatch) {\n      const host = hostMatch[1];\n      if (excluirDominios.some(ex => host.includes(ex))) continue;\n    }\n  }\n  \n  const key = `${normalizeName(l.nombre)}|${l.zona}`;\n  if (vistos.has(key)) continue;\n  vistos.add(key);\n  \n  leads.push({ json: l });\n}\n\nreturn leads.length > 0 ? leads : [{ json: { _no_leads: true } }];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000031",
+      "name": "Filtrar y Dedup Lote",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 0]
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "cond-no-skip",
+              "leftValue": "={{ $json._no_leads }}",
+              "rightValue": "",
+              "operator": { "type": "notEquals", "operation": "notEquals", "singleValue": false }
+            },
+            {
+              "id": "cond-not-ya-crm",
+              "leftValue": "={{ $json.ya_en_crm }}",
+              "rightValue": true,
+              "operator": { "type": "notEquals", "operation": "notEquals", "singleValue": false }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000032",
+      "name": "Skip nulos y ya-en-CRM",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1980, 0]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_BASE_URL || 'http://localhost:3000' }}/api/comercios/lead-from-n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "x-crm-api-key", "value": "={{ $env.CRM_API_KEY || '' }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "1a000000-0000-0000-0000-000000000040",
+      "name": "Push al CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2200, 0],
+      "notes": "Cada lead se guarda en el CRM (con dedupe del lado del server).\nEl CRM infiere estadoWeb y prioridad si no vienen en el body."
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// Construye el mensaje enriquecido para Telegram y filtra solo prioridad Alta\nconst items = $input.all();\nconst config = $('Cargar Config Rubros/Zonas').item.json;\nconst prioridadFiltro = config.telegram.notificar_solo_prioridad || ['Alta'];\n\nconst leadsFiltrados = items.filter(item => {\n  const c = item.json.comercio || item.json;\n  if (!c) return false;\n  if (item.json.created === false) return false; // duplicado\n  return prioridadFiltro.includes(c.prioridad || 'Alta');\n});\n\nif (leadsFiltrados.length === 0) {\n  return [{ json: { _sin_leads_alta: true, total_leads: items.length } }];\n}\n\nconst fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });\n\n// Mensaje inicial\nlet mensaje = config.telegram.mensaje_inicial\n  .replace('{total}', leadsFiltrados.length)\n  .replace('{fecha}', fecha) + '\\n\\n';\n\n// Generar un item por cada lead con su mensaje formateado\nconst mensajes = [];\nfor (const item of leadsFiltrados) {\n  const c = item.json.comercio || item.json;\n  \n  // WhatsApp deep link\n  let waLink = '';\n  if (c.whatsapp) {\n    const texto = encodeURIComponent(`Hola ${c.nombre}, vi tu negocio y me gustaría proponerte algo. Soy Gonzalo de Paulero Studio.`);\n    waLink = `https://wa.me/${c.whatsapp}?text=${texto}`;\n  } else if (c.telefono) {\n    const digits = (c.telefono || '').replace(/\\D/g, '');\n    if (digits.length > 6) {\n      const texto = encodeURIComponent(`Hola ${c.nombre}, vi tu negocio y me gustaría proponerte algo. Soy Gonzalo de Paulero Studio.`);\n      waLink = `https://wa.me/${digits.length === 10 ? '549' + digits : digits}?text=${texto}`;\n    }\n  }\n  \n  // CRM deep link (asumiendo que el CRM tiene una URL /comercio/{id})\n  const crmLink = `${$env.CRM_BASE_URL || 'http://localhost:3000'}/?comercio=${c.id}`;\n  \n  const emoji = c.prioridad === 'Alta' ? '🔥' : c.prioridad === 'Media' ? '🟡' : '⚪';\n  \n  const leadMsg = `${emoji} <b>${c.nombre}</b>\n` +\n    `📍 ${c.rubro} en ${c.zona}\\n` +\n    (c.direccion ? `🏠 ${c.direccion}\\n` : '') +\n    (c.telefono ? `📞 ${c.telefono}\\n` : '') +\n    (c.webUrl ? `🌐 ${c.webUrl}\\n` : '') +\n    (c.estadoWeb ? `📊 Web: ${c.estadoWeb}\\n` : '') +\n    (c.redesSociales ? `📱 ${c.redesSociales}\\n` : '') +\n    (c.notas ? `📝 ${c.notas.substring(0, 120)}${c.notas.length > 120 ? '…' : ''}\\n` : '') +\n    `🏷️ Fuente: ${item.json.comercio?.notas?.match(/Fuente: ([^|]+)/)?.[1]?.trim() || 'n8n'}\\n` +\n    (c.pitchSugerido ? `💬 <i>Pitch:</i> ${c.pitchSugerido}\\n` : '') +\n    (waLink ? `\\n🟢 <a href=\\\"${waLink}\\\">Abrir WhatsApp</a>` : '⚠️ Sin WhatsApp') +\n    ` | <a href=\\\"${crmLink}\\\">Ver en CRM</a>`;\n  \n  mensajes.push({ json: { mensaje: leadMsg, lead: c, waLink, crmLink } });\n}\n\n// El primer item lleva el encabezado\nif (mensajes.length > 0) {\n  mensajes[0].json.mensaje = mensaje + mensajes[0].json.mensaje;\n}\n\nreturn mensajes;"
+      },
+      "id": "1a000000-0000-0000-0000-000000000050",
+      "name": "Construir Mensaje Telegram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2420, 0]
+    },
+
+    {
+      "parameters": {
+        "chatId": "={{$env.TELEGRAM_CHAT_ID}}",
+        "text": "={{ $json.mensaje }}",
+        "parseMode": "HTML",
+        "disableWebPagePreview": true,
+        "additionalFields": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000051",
+      "name": "Enviar a Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [2640, 0],
+      "notes": "Cada lead de prioridad alta se envía como mensaje separado con botones HTML a WhatsApp y al CRM."
+    },
+
+    {
+      "parameters": {},
+      "id": "1a000000-0000-0000-0000-000000000060",
+      "name": "Volver al Loop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2860, 0]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (Lun/Mié/Vie 9am)": {
+      "main": [
+        [
+          { "node": "Cargar Config Rubros/Zonas", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Cargar Config Rubros/Zonas": {
+      "main": [
+        [
+          { "node": "Generar Combinaciones Rubro×Zona", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Generar Combinaciones Rubro×Zona": {
+      "main": [
+        [
+          { "node": "Loop (1 rubro×zona por vez)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Loop (1 rubro×zona por vez)": {
+      "main": [
+        [
+          { "node": "Google Maps (Apify)", "type": "main", "index": 0 },
+          { "node": "Web Search + LLM (CRM)", "type": "main", "index": 0 },
+          { "node": "Instagram (Apify)", "type": "main", "index": 0 },
+          { "node": "Facebook Pages (Apify)", "type": "main", "index": 0 },
+          { "node": "Páginas Amarillas AR", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Maps (Apify)": {
+      "main": [
+        [
+          { "node": "Normalizar Google Maps → Lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Web Search + LLM (CRM)": {
+      "main": [
+        [
+          { "node": "Normalizar Web Search → Lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Instagram (Apify)": {
+      "main": [
+        [
+          { "node": "Normalizar Instagram → Lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Facebook Pages (Apify)": {
+      "main": [
+        [
+          { "node": "Normalizar Facebook → Lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Páginas Amarillas AR": {
+      "main": [
+        [
+          { "node": "Parsear Páginas Amarillas", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalizar Google Maps → Lead": {
+      "main": [
+        [
+          { "node": "Merge Todas las Fuentes", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalizar Web Search → Lead": {
+      "main": [
+        [
+          { "node": "Merge Todas las Fuentes", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Normalizar Instagram → Lead": {
+      "main": [
+        [
+          { "node": "Merge Todas las Fuentes", "type": "main", "index": 2 }
+        ]
+      ]
+    },
+    "Normalizar Facebook → Lead": {
+      "main": [
+        [
+          { "node": "Merge Todas las Fuentes", "type": "main", "index": 3 }
+        ]
+      ]
+    },
+    "Parsear Páginas Amarillas": {
+      "main": [
+        [
+          { "node": "Merge Todas las Fuentes", "type": "main", "index": 4 }
+        ]
+      ]
+    },
+    "Merge Todas las Fuentes": {
+      "main": [
+        [
+          { "node": "Filtrar y Dedup Lote", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Filtrar y Dedup Lote": {
+      "main": [
+        [
+          { "node": "Skip nulos y ya-en-CRM", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Skip nulos y ya-en-CRM": {
+      "main": [
+        [
+          { "node": "Push al CRM", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Push al CRM": {
+      "main": [
+        [
+          { "node": "Construir Mensaje Telegram", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Construir Mensaje Telegram": {
+      "main": [
+        [
+          { "node": "Enviar a Telegram", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Enviar a Telegram": {
+      "main": [
+        [
+          { "node": "Volver al Loop", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Volver al Loop": {
+      "main": [
+        [
+          { "node": "Loop (1 rubro×zona por vez)", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_docs": "Workflow de prospección automática para Paulero Studio. Requiere: APIFY_API_TOKEN, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, CRM_BASE_URL, CRM_API_KEY. Ver README en download/n8n/README.md"
+}
