@@ -1,315 +1,299 @@
-# Prospección Automática con n8n — Paulero Studio
+# Prospección Automática — Setup Final (n8n + CRM + Telegram)
 
-Setup paso a paso para recibir leads periódicos por Telegram y abordarlos por WhatsApp.
+Setup simplificado y probado: cada **Lunes, Miércoles y Viernes a las 9 AM**, n8n busca comercios en el Valle de Punilla y te los manda por Telegram con pitch sugerido + botón a WhatsApp.
 
----
-
-## ¿Qué vas a tener al final?
-
-Cada **Lunes, Miércoles y Viernes a las 9 AM** (hora Argentina), n8n va a:
-
-1. Buscar comercios en **5 fuentes** (Google Maps, Instagram, Facebook, Páginas Amarillas AR, web search + LLM)
-2. Normalizar y deduplicar los leads
-3. Guardarlos en tu CRM (deployado en Vercel)
-4. Mandarte por **Telegram** los de prioridad **alta** (sin web propia o web amateur) con un botón directo a WhatsApp
-
-Cada mensaje de Telegram incluye:
-- Nombre, rubro, zona, dirección, teléfono
-- Estado de la web (Sin web / Amateur Canva / Wix / Existe)
-- Pitch sugerido para abordar
-- Link directo a WhatsApp con mensaje pre-escrito
-- Link al lead en el CRM
+**Costo total: USD 0/mes** (sin Apify, sin servicios pagos).
 
 ---
 
-## Arquitectura
+## Arquitectura final (simplificada)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                       n8n (local)                            │
-│                                                              │
-│  Schedule ──▶ Load config ──▶ Loop rubro×zona                │
-│                                  │                            │
-│       ┌──────────────┬──────────┼───────────┬───────────┐   │
-│       ▼              ▼          ▼           ▼           ▼   │
-│   Google Maps   Web Search   Instagram   Facebook   Págs.Am.│
-│   (Apify)       (CRM API)    (Apify)     (Apify)    (HTML)   │
-│       │              │          │           │           │   │
-│       └──────────────┴──────────┴───────────┴───────────┘   │
-│                                  │                            │
-│                          Merge + Dedup + Score               │
-│                                  │                            │
-│              ┌───────────────────┴───────────────────┐       │
-│              ▼                                       ▼       │
-│       POST /api/comercios/                   Telegram        │
-│         lead-from-n8n (CRM)               (notif alta prior.)│
-└─────────────────────────────────────────────────────────────┘
-                                            │
-                                            ▼
-                          ┌─────────────────────────────────┐
-                          │  Tu celu (Telegram + WhatsApp)  │
-                          └─────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                          n8n (local)                          │
+│                                                               │
+│  Schedule Lun/Mié/Vie 9am                                     │
+│         │                                                     │
+│         ▼                                                     │
+│  HTTP: GET /n8n-config/prospeccion-config.json (rubros/zonas) │
+│         │                                                     │
+│         ▼                                                     │
+│  Loop por cada combinación rubro × zona                      │
+│         │                                                     │
+│         ▼                                                     │
+│  HTTP: POST /api/comercios/buscar-online                      │
+│  (El CRM hace: web search + LLM extraction + dedup + save)    │
+│         │                                                     │
+│         ▼                                                     │
+│  Code node: arma mensaje HTML con pitch + WhatsApp link       │
+│         │                                                     │
+│         ▼                                                     │
+│  Telegram: manda 1 mensaje por lead                           │
+└──────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+              ┌─────────────────────────────────┐
+              │  Telegram (con botón a WhatsApp)│
+              └─────────────────────────────────┘
 ```
 
----
-
-## Requisitos previos
-
-Antes de empezar, aseguráte de tener:
-
-- [n8n instalado localmente](https://docs.n8n.io/hosting/installation/) (Docker, npm o desktop)
-- El CRM de Paulero Studio deployado en Vercel (esto ya lo tenés)
-- Una cuenta en [Apify](https://apify.com/) — trial gratuito con USD 5 de crédito
-- Telegram instalado en tu celular
-- Acceso al repo `gpaulero/paulerostudio` en GitHub
+**Solo 9 nodos en n8n.** El CRM hace toda la тяжелa (búsqueda + extracción + dedup), n8n solo orquesta y manda mensajes.
 
 ---
 
-## Paso 1 — Hacer deploy del CRM actualizado
+## Variables de entorno que vas a necesitar
 
-El CRM necesita el nuevo endpoint `/api/comercios/lead-from-n8n` para recibir leads desde n8n.
+| Variable | Valor | Dónde se setea |
+|----------|-------|----------------|
+| `CRM_BASE_URL` | `https://TU-DOMINIO.vercel.app` | n8n |
+| `TELEGRAM_BOT_TOKEN` | `8811084254:AAH-r9OCoeyzKNjyZzlDL6uouutuOsvywL4` | n8n |
+| `TELEGRAM_CHAT_ID` | `7780475797` | n8n |
+
+> ✅ Ya tenés el bot de Telegram configurado (verificamos en la sesión anterior).
+> Solo falta deployar el CRM en Vercel y configurar n8n.
+
+---
+
+## Paso 1 — Hacer push del CRM a GitHub (con los nuevos cambios)
+
+Los cambios ya están commiteados en `/home/z/my-project/`. Necesitás subirlos a tu GitHub.
+
+### Opción A — Si tenés el repo clonado en tu compu
 
 ```bash
-# En tu compu local, en el repo del CRM
-cd paulerostudio
-git pull origin main        # o git clone si no lo tenés
-git status                  # confirmá que está limpio
+cd ruta/a/tu/paulerostudio
+git pull origin main
 
-# Generar una API key segura para n8n
-openssl rand -hex 32
-# → copia el output, ej: a1b2c3d4e5f6...
+# Copiar los archivos nuevos desde /home/z/my-project/
+# (o usar scp/rsync desde el entorno Z.ai si tenés acceso)
 
-# Crear .env.local con la API key
-cat > .env.local <<EOF
-DATABASE_URL="postgresql://..."          # tu URL de Neon (en Vercel ya está)
-CRM_API_KEY="a1b2c3d4e5f6..."            # el output de openssl de arriba
-CRM_BASE_URL="https://TU-DOMINIO.vercel.app"
-EOF
-
-# Commit + push + deploy automático en Vercel
+# Hacer commit de los cambios nuevos
 git add .
-git commit -m "feat: endpoint /api/comercios/lead-from-n8n + config n8n + setup-telegram script"
+git commit -m "feat: endpoint buscar-online devuelve datos completos + workflow n8n simplificado"
 git push origin main
 ```
 
-**En Vercel:**
+### Opción B — Si querés hacerlo desde cero
 
-1. Andá a tu proyecto en https://vercel.com/dashboard
-2. Settings → Environment Variables
-3. Agregá `CRM_API_KEY` con el valor generado ( Production + Preview + Development)
-4. Agregá `CRM_BASE_URL` = `https://TU-DOMINIO.vercel.app`
-5. Hacé un redeploy (Deployments → ⋮ → Redeploy)
+Descargá estos archivos desde `/home/z/my-project/` a tu repo local:
 
-**Verificá que el endpoint responde:**
+**Archivos nuevos / modificados:**
+- `src/app/api/comercios/buscar-online/route.ts` (modificado — devuelve datos completos)
+- `src/app/api/comercios/lead-from-n8n/route.ts` (nuevo — endpoint opcional para otros usos)
+- `public/n8n-config/prospeccion-config.json` (nuevo — config editable de rubros/zonas)
+- `scripts/setup-telegram-bot.sh` (nuevo — helper para crear bot de Telegram)
+- `download/n8n/paulero-studio-prospeccion-simple.json` (nuevo — workflow n8n a importar)
+- `.env.example` (actualizado con `CRM_API_KEY` y `CRM_BASE_URL`)
+
+Después: `git add . && git commit -m "..." && git push origin main`
+
+---
+
+## Paso 2 — Deploy automático en Vercel
+
+Si ya tenés Vercel conectado a tu repo de GitHub, el push anterior dispara un deploy automático. Esperá 1-2 minutos a que termine.
+
+### Verificar que el deploy salió bien
 
 ```bash
-curl -X POST https://TU-DOMINIO.vercel.app/api/comercios/lead-from-n8n \
+curl https://TU-DOMINIO.vercel.app/n8n-config/prospeccion-config.json
+# Debe devolver un JSON con rubros y zonas
+```
+
+### Configurar variables de entorno en Vercel
+
+1. Andá a https://vercel.com/dashboard
+2. Abrí tu proyecto `paulerostudio`
+3. Settings → Environment Variables
+4. Agregá estas (si no están):
+
+| Name | Value | Environments |
+|------|-------|--------------|
+| `DATABASE_URL` | (tu Neon Postgres URL) | Production, Preview, Development |
+| `CRM_PASSWORD` | `paulero2024` (o la que tengas) | Production, Preview, Development |
+| `CRM_API_KEY` | (generar con `openssl rand -hex 32`) | Production |
+| `CRM_BASE_URL` | `https://TU-DOMINIO.vercel.app` | Production |
+| `GROQ_API_KEY` | (tu key de Groq para el chatbot) | Production |
+| `ZAI_API_KEY` | (tu key de Z-AI) | Production |
+
+> 💡 `CRM_API_KEY` es opcional por ahora (el endpoint `buscar-online` no la requiere). Solo la necesitás si más adelante querés que n8n use `/api/comercios/lead-from-n8n` con auth.
+
+5. Después de agregar, hacé un redeploy: Deployments → ⋮ → Redeploy
+
+### Probar que el endpoint funciona
+
+```bash
+curl -X POST https://TU-DOMINIO.vercel.app/api/comercios/buscar-online \
   -H "Content-Type: application/json" \
-  -H "x-crm-api-key: TU_API_KEY" \
-  -d '{
-    "nombre": "Test Bot Verification",
-    "rubro": "Test",
-    "zona": "La Falda",
-    "fuente": "test"
-  }'
+  -d '{"rubro": "Hotel", "zona": "La Falda"}'
 
 # Respuesta esperada:
-# { "ok": true, "created": true, "comercio": { "id": "...", ... } }
+# {
+#   "ok": true,
+#   "message": "5 comercios nuevos encontrados para Hotel en La Falda. ...",
+#   "nuevos": [
+#     {
+#       "id": "...",
+#       "nombre": "Hotel Marydor La Falda",
+#       "rubro": "Hotel",
+#       "zona": "La Falda",
+#       "direccion": null,
+#       "telefono": null,
+#       "whatsapp": null,
+#       "webUrl": "https://...",
+#       "estadoWeb": "Existe (a verificar)",
+#       "prioridad": "Media",
+#       "notas": "...",
+#       "pitchSugerido": null
+#     },
+#     ...
+#   ],
+#   "duplicados": 0,
+#   "totalResultados": 10
+# }
 ```
 
 ---
 
-## Paso 2 — Configurar el bot de Telegram
+## Paso 3 — Instalar n8n localmente (si no lo tenés)
 
-Desde la raíz del repo (la carpeta donde está `scripts/`):
+### Opción A — Docker (recomendado, fácil de mantener)
 
 ```bash
-./scripts/setup-telegram-bot.sh
-```
+# Crear directorio para n8n
+mkdir -p ~/n8n && cd ~/n8n
 
-El script te guía por:
-1. Crear el bot con `@BotFather` → te da un **TOKEN**
-2. Verifica que el bot responde
-3. Te hace mandar un mensaje al bot para descubrir tu **CHAT_ID**
-4. Te envía un mensaje de prueba con todos los datos
-
-Al final te va a mostrar:
-
-```
-TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ
-TELEGRAM_CHAT_ID=987654321
-```
-
-Anotá esos dos valores — los vas a necesitar en el paso 4.
-
-> 💡 **Si querés que los leads lleguen a un grupo** (con socios, equipo, etc.):
-> - Creá un grupo en Telegram
-> - Agregá al bot como **administrador**
-> - Mandá un mensaje al grupo (con `/start` o cualquier texto)
-> - El script te va a mostrar el ID del grupo (con prefijo `-100...`) como una de las opciones
-
----
-
-## Paso 3 — Configurar Apify (para Google Maps, Instagram y Facebook)
-
-Apify te da USD 5 de crédito gratuito al registrarte. Con eso alcanza para:
-- ~200 comercios de Google Maps
-- ~500 posts de Instagram
-- ~200 páginas de Facebook
-
-(Si querés más volumen, el plan pago arranca en USD 49/mes por 100 GB de compute.)
-
-**Pasos:**
-
-1. Andá a https://apify.com/ y create una cuenta
-2. Andá a https://console.apify.com/account/integrations
-3. Copiá tu **API token**
-
-**Probá que funciona:**
-
-```bash
-curl -X POST \
-  "https://api.apify.com/v2/acts/apify~google-maps-scraper/run-sync-get-dataset-items?token=TU_APIFY_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "searchStringsArray": ["hotel La Falda Córdoba"],
-    "maxCrawledPlacesPerSearch": 3,
-    "language": "es",
-    "countryCode": "ar"
-  }'
-
-# Te devuelve un array con hoteles de La Falda
-```
-
----
-
-## Paso 4 — Configurar variables de entorno en n8n
-
-Dependiendo de cómo tengas instalado n8n:
-
-### Opción A — Docker Compose (recomendado para uso permanente)
-
-Si usás Docker, editá el `docker-compose.yml` y agregá en `environment`:
-
-```yaml
+# Crear docker-compose.yml
+cat > docker-compose.yml <<EOF
+version: '3.8'
 services:
   n8n:
     image: n8nio/n8n:latest
+    restart: always
+    ports:
+      - "5678:5678"
     environment:
       - N8N_HOST=localhost
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      # ↓↓↓ variables para el workflow de prospección ↓↓↓
-      - APIFY_API_TOKEN=tu_apify_token_aqui
-      - TELEGRAM_BOT_TOKEN=1234567890:ABCdef...
-      - TELEGRAM_CHAT_ID=987654321
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Argentina/Cordoba
+      # Variables para el workflow de Paulero Studio:
       - CRM_BASE_URL=https://TU-DOMINIO.vercel.app
-      - CRM_API_KEY=a1b2c3d4e5f6...
-```
+      - TELEGRAM_BOT_TOKEN=8811084254:AAH-r9OCoeyzKNjyZzlDL6uouutuOsvywL4
+      - TELEGRAM_CHAT_ID=7780475797
+    volumes:
+      - ./data:/home/node/.n8n
+EOF
 
-Reiniciá n8n:
-
-```bash
-docker compose down
+# Levantar n8n
 docker compose up -d
+
+# Verificar que está corriendo
+docker compose ps
 ```
 
-### Opción B — npm global
+Abrí http://localhost:5678 en tu navegador — vas a ver la UI de n8n.
 
-Si lo instalaste con `npm install -g n8n`, agregá las variables en tu `.env` o exportalas en el shell:
+### Opción B — npm global (más simple pero menos robusto)
 
 ```bash
-export APIFY_API_TOKEN=tu_apify_token_aqui
-export TELEGRAM_BOT_TOKEN=1234567890:ABCdef...
-export TELEGRAM_CHAT_ID=987654321
-export CRM_BASE_URL=https://TU-DOMINIO.vercel.app
-export CRM_API_KEY=a1b2c3d4e5f6...
+npm install -g n8n
 
+# Setear variables de entorno en tu shell (agregá a ~/.bashrc o ~/.zshrc)
+export CRM_BASE_URL=https://TU-DOMINIO.vercel.app
+export TELEGRAM_BOT_TOKEN=8811084254:AAH-r9OCoeyzKNjyZzlDL6uouutuOsvywL4
+export TELEGRAM_CHAT_ID=7780475797
+export GENERIC_TIMEZONE=America/Argentina/Cordoba
+
+# Arrancar n8n
 n8n start
 ```
 
-### Opción C — n8n Desktop
-
-En n8n Desktop no se pueden setear env vars directamente. En ese caso, dentro de cada nodo del workflow reemplazá `{{$env.VARIABLE}}` por el valor literal. **Menos seguro** porque queda hardcodeado en el workflow.
+Abrí http://localhost:5678
 
 ---
 
-## Paso 5 — Importar el workflow en n8n
+## Paso 4 — Importar el workflow en n8n
 
-1. Abrí n8n en tu navegador: http://localhost:5678
-2. Andá a **Workflows** → **Add workflow**
-3. Hacé clic en los tres puntos `⋮` arriba a la derecha → **Import from File**
-4. Seleccioná el archivo `download/n8n/paulero-studio-prospeccion.json`
-5. Va a aparecer el workflow con todos los nodos:
-
-   - Schedule Trigger (Lun/Mié/Vie 9am)
-   - Cargar Config Rubros/Zonas
-   - Generar Combinaciones Rubro×Zona
-   - Loop (1 rubro×zona por vez)
-   - 5 fuentes en paralelo (Google Maps, Web Search, Instagram, Facebook, Páginas Amarillas)
-   - 5 nodos de normalización (uno por fuente)
-   - Merge Todas las Fuentes
-   - Filtrar y Dedup Lote
-   - Skip nulos y ya-en-CRM
-   - Push al CRM
-   - Construir Mensaje Telegram
-   - Enviar a Telegram
+1. Descargá el archivo `paulero-studio-prospeccion-simple.json` (está en `/home/z/my-project/download/n8n/`)
+2. En n8n (http://localhost:5678):
+   - Hacé clic en **"Workflows"** en el menú izquierdo
+   - Botón **"Add workflow"** arriba a la derecha
+   - Tres puntos `⋮` arriba a la derecha → **"Import from File"**
+   - Seleccioná el JSON
+3. Vas a ver 9 nodos conectados:
+   - Schedule Trigger
+   - Cargar Config
+   - Generar Combinaciones
+   - Loop
+   - Buscar en CRM
+   - Expandir Leads
+   - Construir Mensaje
+   - Enviar Telegram
    - Volver al Loop
 
-6. **IMPORTANTE — Configurar credenciales de Telegram:**
+---
 
-   El nodo **"Enviar a Telegram"** necesita credenciales. Hacé clic en el nodo → **Credential to connect with** → **Create New** → Telegram API
+## Paso 5 — Configurar la credencial de Telegram en n8n
 
-   - **Access Token**: el `TELEGRAM_BOT_TOKEN` que te dio el script del paso 2
-   - Guardá con un nombre (ej: "Paulero Leads Bot")
+El nodo "Enviar Telegram" necesita una credencial. Hacé esto UNA sola vez:
 
-   > Si en el paso 4 ya seteaste `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` como env vars, el workflow los usa automáticamente. La credencial de Telegram en n8n solo necesita el token.
+1. Hacé clic en el nodo **"Enviar Telegram"**
+2. En el campo **"Credential to connect with"**, hacé clic en **"Create New"**
+3. Seleccioná **"Telegram API"**
+4. Completá:
+   - **Access Token**: `8811084254:AAH-r9OCoeyzKNjyZzlDL6uouutuOsvywL4`
+   - **Name**: `Paulero Leads Bot`
+5. Guardá
 
-7. **Activar el workflow** con el switch arriba a la derecha (de `Inactive` a `Active`)
+> ℹ️ El `chatId` no se pone en la credencial — se pasa como variable de entorno `TELEGRAM_CHAT_ID` y el nodo lo lee con `={{ $env.TELEGRAM_CHAT_ID }}`.
 
 ---
 
 ## Paso 6 — Probar el workflow manualmente
 
-Antes de esperar al Lunes, probemos que todo funciona:
+Antes de esperar al Lunes, hagamos una prueba real:
 
-1. En n8n, hacé clic en **"Schedule Trigger"** → el botón **Execute workflow** (play)
-2. Vas a ver cómo se ejecutan los nodos uno por uno
-3. Si todo está bien configurado:
-   - Cada nodo HTTP Request devuelve 200/201
-   - El nodo "Push al CRM" guarda los comercios
-   - El nodo "Enviar a Telegram" manda mensajes a tu bot
+1. En n8n, abrí el workflow
+2. Hacé clic en el nodo **"Schedule Trigger"**
+3. Hacé clic en el botón **"Execute workflow"** (play, arriba a la izquierda del nodo)
+4. Vas a ver cómo se ejecutan los nodos uno por uno
+5. **En tu Telegram deberían empezar a llegar mensajes** con leads
 
-**Si algo falla**, los errores más comunes son:
+Si todo anda bien:
+- El nodo "Cargar Config" devuelve el JSON con rubros y zonas
+- El nodo "Generar Combinaciones" crea 24 items (8 rubros × 3 zonas)
+- El loop los procesa uno por uno (~30 segundos por búsqueda)
+- Cada lead nuevo se manda a Telegram como mensaje separado
 
-| Error | Causa | Solución |
-|-------|-------|----------|
-| `401 Unauthorized` en Push al CRM | `CRM_API_KEY` no coincide | Verificá que la env var en n8n sea igual a la de Vercel |
-| `Apify 402 Payment Required` | Te quedaste sin crédito | Recargá saldo en https://console.apify.com/account/billing |
-| `Telegram 401 Unauthorized` | `TELEGRAM_BOT_TOKEN` incorrecto | Regenerá el token con `/revoke` en @BotFather y volvé a correr el script |
-| `Telegram 403 Forbidden: chat not found` | `TELEGRAM_CHAT_ID` incorrecto o no mandaste `/start` al bot | Mandale un mensaje al bot primero y volvé a obtener el chat ID |
-| Timeout en Google Maps | Apify scraper tarda >2 min | Aumentá el timeout del nodo HTTP Request a 180000ms |
-| `ECONNREFUSED localhost:3000` | n8n no puede ver tu CRM local | En CRM_BASE_URL usá tu dominio de Vercel, no localhost |
+**Tiempo total: ~12-15 minutos para las 24 búsquedas.**
 
 ---
 
-## Paso 7 — Personalizar rubros y zonas
+## Paso 7 — Activar el workflow
 
-El workflow lee la configuración desde:
+Una vez que confirmaste que funciona:
 
-```
-public/n8n-config/prospeccion-config.json
-```
+1. Arriba a la derecha del workflow, cambiale el switch de **Inactive** a **Active**
+2. A partir de ahora, va a correr solo los **Lunes, Miércoles y Viernes a las 9 AM** hora Argentina
 
-en el dominio del CRM. Esto significa que **podés cambiar rubros y zonas sin tocar n8n**.
+Para verificar que está activo:
+- En la lista de Workflows, el tuyo debe tener un dot verde al lado del nombre
+- En la tab "Executions" vas a ver el historial cuando corra
 
-Editá el archivo y agregá lo que necesites:
+---
+
+## Personalización
+
+### Cambiar rubros o zonas (sin tocar n8n)
+
+Editá en el repo del CRM: `public/n8n-config/prospeccion-config.json`
 
 ```json
 {
   "rubros": [
-    // ... los actuales
     {
       "nombre": "Veterinaria",
       "apify_searchTerms_template": "veterinaria {zona} Córdoba",
@@ -318,138 +302,122 @@ Editá el archivo y agregá lo que necesites:
     }
   ],
   "zonas": [
-    // ... las actuales
-    { "nombre": "San Francisco", "provincia": "Córdoba", "prioridad": "Media" }
+    { "nombre": "Capilla del Monte", "provincia": "Córdoba", "prioridad": "Media" }
   ]
 }
 ```
 
-Commit + push y n8n lo va a leer en la próxima ejecución.
+Commit + push + deploy automático. n8n lo va a leer en la próxima ejecución.
 
-### Placeholders en plantillas
+### Cambiar frecuencia del schedule
 
-| Placeholder | Significado | Ejemplo |
-|-------------|-------------|---------|
-| `{zona}` | Nombre de la zona | "La Falda" |
-| `{zona_limpio}` | Nombre sin espacios ni mayúsculas | "lafalda" |
+En n8n, abrí el nodo **"Schedule Trigger"** y cambiá el cron:
 
----
+| Quiero que corra... | Cron |
+|----------------------|------|
+| Lunes/Miércoles/Viernes 9am (default) | `0 9 * * 1,3,5` |
+| Todos los días a las 9am | `0 9 * * *` |
+| Cada lunes a las 10am | `0 10 * * 1` |
+| Cada 6 horas | `0 */6 * * *` |
 
-## Paso 8 — Ajustar frecuencia
+### Agregar pitches para nuevos rubros
 
-Para cambiar cuándo corre el workflow:
+Editá el Code node **"Construir Mensaje"** en n8n. En el objeto `PITCHES` agregá tu entrada:
 
-1. En n8n, abrí el nodo **"Schedule Trigger (Lun/Mié/Vie 9am)"**
-2. En **Cron Expression**, cambiá la expresión:
-
-   | Quiero que corra... | Cron |
-   |----------------------|------|
-   | Todos los días a las 9 AM | `0 9 * * *` |
-   | Lunes/Miércoles/Viernes a las 9 AM (default) | `0 9 * * 1,3,5` |
-   | Cada lunes a las 10 AM | `0 10 * * 1` |
-   | Cada 6 horas | `0 */6 * * *` |
-   | Solo los días 1 y 15 del mes | `0 9 1,15 * *` |
-
-3. Guardá el nodo. La próxima ejecución respeta la nueva frecuencia.
-
----
-
-## ¿Cómo sigue el proceso de venta?
-
-Cuando te llega un lead por Telegram:
-
-1. Hacé clic en **"Abrir WhatsApp"** → abre WhatsApp con un mensaje pre-escrito
-2. Personalizá el primer mensaje (el bot deja uno genérico, sumale algo específico del lead)
-3. Si responde → abrilo en el CRM y cambiá el estado a "Contactado" → "Respondio"
-4. Si cierra → cambiá a "Cerrado" y agregá un seguimiento con el monto
-
-**Flujo de estados en el CRM:**
-
-```
-Sin contactar → Contactado → Respondio → Reunion → Cerrado
-                                              ↘ Rechazado
+```javascript
+const PITCHES = {
+  "Hotel": "...",
+  "Restaurante": "...",
+  // Agregá tu nuevo rubro:
+  "Ferretería": "Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su ferretería en {zona} y les propongo una web con catálogo online, cotizador automático y WhatsApp integrado. ¿10 minutos esta semana?",
+  "default": "..."
+};
 ```
 
-Cada lead que te llega por n8n arranca en `Sin contactar` con prioridad inferida según su web.
-
 ---
 
-## Costos estimados
-
-| Servicio | Costo |
-|----------|-------|
-| n8n local | $0 |
-| Telegram bot | $0 |
-| Vercel CRM (plan Hobby) | $0 |
-| Neon Postgres (plan Free) | $0 |
-| Apify trial (USD 5 crédito) | Cubre ~200 leads de Google Maps |
-| Apify pago (cuando se agote el trial) | USD 49/mes por 100 GB compute (~10.000 leads) |
-
-**Costo total mes 1: $0** (con trial de Apify gratis)
-**Costo steady state:** USD 49/mes si consumís Apify regularmente, o $0 si solo usás web search + directorios.
-
----
-
-## Troubleshooting avanzado
+## Troubleshooting
 
 ### "No me llegan los mensajes de Telegram"
 
-1. Verificá que el bot tenga el chat ID correcto: mandale `/start` al bot, volvé a correr `setup-telegram-bot.sh`
-2. En n8n, abrí la última ejecución fallida y mirá el log del nodo "Enviar a Telegram"
-3. Si dice `chat not found`: el chat ID está mal
-4. Si dice `bot was blocked by the user`: le diste block al bot en Telegram
+1. Verificá que las 3 variables de entorno estén bien seteadas en n8n
+2. En n8n, abrí la última ejecución y mirá el log del nodo "Enviar Telegram"
+3. Errores comunes:
+   - `401 Unauthorized` → token mal configurado
+   - `403 Forbidden: chat not found` → chat ID incorrecto o no le mandaste `/start` al bot
 
-### "El workflow corre pero no encuentra leads"
+### "El workflow corre pero el endpoint del CRM falla"
 
-1. Verificá que `CRM_BASE_URL` sea accesible desde tu compu (si n8n corre local, también puede ver Vercel)
-2. Probá el endpoint `/n8n-config/prospeccion-config.json` en el navegador: debe devolver el JSON
-3. Si las búsquedas en Google Maps no devuelven nada, intentá con searchTerm más amplio (ej: "restaurante" en vez de "restaurante vegetariano")
-4. Para Instagram: los hashtags deben existir y tener al menos 10 posts
+1. Probá el endpoint manualmente:
+   ```bash
+   curl -X POST https://TU-DOMINIO.vercel.app/api/comercios/buscar-online \
+     -H "Content-Type: application/json" \
+     -d '{"rubro": "Hotel", "zona": "La Falda"}'
+   ```
+2. Si responde con error 500 → revisá los logs en Vercel (Deployments → tu deploy → Logs)
+3. Si responde con error 502 → esperá unos minutos, Vercel puede estar en cold start
 
-### "Me llegan leads duplicados"
+### "Me llegan pocos leads"
 
-El deduplication funciona por nombre normalizado + zona. Si te llegan dos "Hotel La Falda" y "Hotel La Falda S.R.L.", los normaliza igual y solo guarda el primero. Si igual llegan duplicados:
-1. Mirá los logs del nodo "Push al CRM"
-2. El endpoint devuelve `{ created: false, duplicado: true }` cuando detecta duplicado
-3. Si querés fusionar manualmente: en el CRM, abrí el duplicado y agregá los datos al principal
+El endpoint hace web search (10 resultados) + LLM extraction. Algunas búsquedas no devuelven leads porque:
+- El rubro es muy específico y no hay comercios en esa zona
+- El LLM no logró identificar comercios claros en los resultados
 
-### "Apify me cobra mucho"
+Para más volumen:
+- Agregá más zonas a la config (más zonas = más búsquedas)
+- Agregá más rubros
 
-El scraper de Google Maps cobra por lugar encontrado, no por búsqueda. Si configurás `maxCrawledPlacesPerSearch: 15` y buscás 4 rubros × 14 zonas = 56 búsquedas, tenés hasta 56 × 15 = 840 lugares × USD 0.025 = **USD 21 por corrida**.
+### "n8n no puede ver el CRM (ECONNREFUSED)"
 
-Para reducir costos:
-- Bajá `maxCrawledPlacesPerSearch` a 5
-- Reducí las zonas (solo Punilla en vez de todo el país)
-- Desactivá las fuentes de Apify y dejá solo "Web Search + LLM" (gratis) y "Páginas Amarillas" (gratis)
+El `CRM_BASE_URL` debe ser la URL pública de Vercel (`https://...`), no `localhost:3000`. n8n corre en tu compu pero hace HTTP requests a internet.
 
 ---
 
-## Estructura de archivos entregados
+## Costos estimados (FINAL)
+
+| Servicio | Costo |
+|----------|-------|
+| Vercel (plan Hobby) | USD 0/mes |
+| Neon Postgres (plan Free) | USD 0/mes |
+| n8n local (Docker en tu compu) | USD 0/mes |
+| Telegram Bot API | USD 0/mes |
+| Z-AI Web Search (incluido en Vercel) | USD 0/mes |
+| Groq API (chatbot) | USD 0/mes (free tier) |
+| **Total** | **USD 0/mes** ✅ |
+
+---
+
+## Archivos del entregable
 
 ```
 download/n8n/
-├── README.md                                    ← este archivo
-├── paulero-studio-prospeccion.json              ← workflow n8n listo para importar
+├── README.md                                  ← este archivo (setup simplificado)
+├── paulero-studio-prospeccion-simple.json     ← workflow n8n a importar (9 nodos)
+└── paulero-studio-prospeccion.json            ← workflow anterior con Apify (alternativa)
 
-src/app/api/comercios/lead-from-n8n/route.ts     ← endpoint nuevo del CRM
+src/app/api/comercios/
+├── buscar-online/route.ts                     ← endpoint mejorado (devuelve datos completos)
+└── lead-from-n8n/route.ts                     ← endpoint opcional para otros usos
 
 public/n8n-config/
-└── prospeccion-config.json                       ← config de rubros/zonas (editable)
+└── prospeccion-config.json                    ← config editable de rubros/zonas
 
 scripts/
-└── setup-telegram-bot.sh                         ← helper para crear el bot de Telegram
+├── setup-telegram-bot.sh                      ← helper para crear bot de Telegram
+├── prospeccion.py                             ← script Python (alternativa a n8n)
+└── prospeccion_simple.py                      ← script Python simplificado (alternativa)
 ```
 
 ---
 
 ## Próximos pasos sugeridos
 
-1. **Plantillas de pitch por rubro** — Crear mensajes de WhatsApp pre-armados para cada rubro (restaurante, hotel, concesionaria...)
-2. **Seguimiento automático** — Workflow n8n separado que mire comercios en estado "Contactado" sin respuesta hace 3 días y te recuerde hacer follow-up
-3. **Scoring más fino** — Sumar un Code node que dé +1 si tiene web amateur, +2 si no tiene web, +1 si está en zona de alta prioridad, etc.
-4. **Dashboard semanal** — Otro workflow que los lunes te mande un resumen: "Esta semana se encontraron X leads, Y están en contacto, Z cerraron"
-5. **Integración con Google Sheets** — Para tener una planilla viva con todos los leads y poder hacer análisis
+1. **Probar el workflow completo este Lunes** — te van a llegar leads automáticamente
+2. **Hacer follow-up de los leads** que vas cerrando en el CRM (cambiar estado a "Contactado" → "Respondio" → "Reunion" → "Cerrado")
+3. **Sumar zonas** cuando ya hayas trabajado las 3 actuales (Capilla del Monte, La Cumbre, etc.)
+4. **Plantillas de respuesta por objeción** — cuando un lead te dice "no tengo tiempo" o "es muy caro", tener respuestas pre-armadas
+5. **Dashboard semanal** — otro workflow que los lunes te mande un resumen de la semana anterior (cuántos leads cerraste, cuántos están pendientes)
 
 ---
 
-¿Preguntas? Volvé a abrir el chat y las resolvemos.
+¿Preguntas? Volvé al chat y las resolvemos.

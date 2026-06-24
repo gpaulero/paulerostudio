@@ -197,7 +197,24 @@ export async function POST(request: NextRequest) {
     const existentesSet = new Set(existentes.map((c) => normalizeName(c.nombre)));
 
     // ── Paso 4: crear los nuevos comercios ──────────────────────
-    const nuevos: Array<{ id: string; nombre: string; webUrl: string | null }> = [];
+    // Devolvemos el comercio completo para que n8n pueda armar el mensaje
+    // de Telegram con todos los datos (telefono, direccion, pitch, etc.)
+    const nuevos: Array<{
+      id: string;
+      nombre: string;
+      rubro: string;
+      zona: string;
+      direccion: string | null;
+      telefono: string | null;
+      whatsapp: string | null;
+      email: string | null;
+      webUrl: string | null;
+      redesSociales: string | null;
+      estadoWeb: string | null;
+      prioridad: string;
+      notas: string | null;
+      pitchSugerido: string | null;
+    }> = [];
     let duplicados = 0;
     const vistos = new Set<string>(); // para no duplicar dentro del mismo lote
 
@@ -246,7 +263,18 @@ export async function POST(request: NextRequest) {
       nuevos.push({
         id: creado.id,
         nombre: creado.nombre,
+        rubro: creado.rubro,
+        zona: creado.zona,
+        direccion: creado.direccion,
+        telefono: creado.telefono,
+        whatsapp: creado.whatsapp,
+        email: creado.email,
         webUrl: creado.webUrl,
+        redesSociales: creado.redesSociales,
+        estadoWeb: creado.estadoWeb,
+        prioridad: creado.prioridad,
+        notas: creado.notas,
+        pitchSugerido: creado.pitchSugerido,
       });
     }
 

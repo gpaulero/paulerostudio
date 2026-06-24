@@ -1,0 +1,175 @@
+{
+  "name": "Paulero Studio — Prospección Automática",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1,3,5"
+            }
+          ]
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000001",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "notes": "Lun/Mié/Vie 9am America/Argentina/Cordoba.\nPara cambiar frecuencia, editar el cron."
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CRM_BASE_URL }}/n8n-config/prospeccion-config.json",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000002",
+      "name": "Cargar Config",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "notes": "Lee config de rubros/zonas desde el CRM.\nPara cambiar rubros/zonas, editá public/n8n-config/prospeccion-config.json en el repo del CRM."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Genera todas las combinaciones rubro×zona a partir de la config.\nconst config = $input.first().json;\nconst items = [];\n\nfor (const rubro of config.rubros || []) {\n  for (const zona of config.zonas || []) {\n    items.push({\n      json: {\n        rubro: rubro.nombre,\n        zona: zona.nombre,\n        pitch_default: rubro.pitch_default || null,\n        config_completa: config\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "id": "a1000001-0000-0000-0000-000000000003",
+      "name": "Generar Combinaciones",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000004",
+      "name": "Loop (1 rubro×zona por vez)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_BASE_URL }}/api/comercios/buscar-online",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"rubro\": \"{{ $json.rubro }}\",\n  \"zona\": \"{{ $json.zona }}\"\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000010",
+      "name": "Buscar en CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "notes": "Llama al endpoint del CRM que ya hace web_search + LLM extraction + dedup + save.\nDevuelve { nuevos: [...], duplicados, totalResultados }.\nGratis: usa z-ai-web-dev-sdk internamente."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expande la respuesta: un item por cada lead nuevo encontrado.\nconst resp = $input.first().json;\nconst rubro = $('Generar Combinaciones').item.json.rubro;\nconst zona = $('Generar Combinaciones').item.json.zona;\nconst pitch_default = $('Generar Combinaciones').item.json.pitch_default;\n\nconst nuevos = resp.nuevos || [];\n\nif (nuevos.length === 0) {\n  return [{ json: { _skip: true, rubro, zona, mensaje: resp.message || 'Sin resultados' } }];\n}\n\nreturn nuevos.map(lead => ({\n  json: {\n    ...lead,\n    rubro,\n    zona,\n    pitch_default\n  }\n}));"
+      },
+      "id": "a1000001-0000-0000-0000-000000000011",
+      "name": "Expandir Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construye el mensaje de Telegram con pitch sugerido + link a WhatsApp\nconst lead = $input.first().json;\n\nif (lead._skip) {\n  // Si no había leads en esta búsqueda, mandamos mensaje informativo\n  return [{\n    json: {\n      mensaje: `ℹ️ <b>${lead.rubro}</b> en <b>${lead.zona}</b>: 0 leads nuevos esta vez.`,\n      skip_crm_link: true\n    }\n  }];\n}\n\n// Pitches por rubro (los mismos que usa el script Python)\nconst PITCHES = {\n  \"Hotel\": \"Hola {nombre}! Vi que están en {zona}. Soy Gonzalo de Paulero Studio. Te propongo una web con reservas online, sincronización con Booking/Airbnb y galería profesional de habitaciones. ¿Tenés 5 minutos esta semana?\",\n  \"Restaurante\": \"Hola {nombre}! Vi su restaurante en {zona}. Soy Gonzalo de Paulero Studio. Te propongo una web con menú digital QR, reservas online y fotos profesionales que venden más platos. ¿Les interesaría ver una demo?\",\n  \"Inmobiliaria\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su inmobiliaria en {zona} y les propongo una web con buscador de propiedades, filtros por precio/zona/tipo y captura automática de leads calificados. ¿10 minutos esta semana?\",\n  \"Concesionaria\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su concesionaria en {zona} y les propongo una web profesional con catálogo de vehículos, simulador de financiación online y captura de leads. ¿Les interesaría ver un demo?\",\n  \"Veterinaria\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su veterinaria en {zona} y les propongo una web con turnos online, historias clínicas digitales y tienda de alimentos. ¿Les interesaría charlar?\",\n  \"Gimnasio\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su gimnasio en {zona} y les propongo una web con inscripción online, planilla de rutinas por alumno y pagos mensuales automáticos. ¿10 minutos esta semana?\",\n  \"Panadería\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su panadería en {zona} y les propongo una web con catálogo de productos, pedidos online para retiro en tienda y WhatsApp integrado. ¿Charlamos?\",\n  \"Peluquería\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio. Vi su peluquería en {zona} y les propongo una web con reserva de turnos online, galería de trabajos y captura de clientes nuevos por Instagram. ¿Les interesaría?\",\n  \"default\": \"Hola {nombre}! Soy Gonzalo de Paulero Studio, desarrollo webs profesionales para comercios en {zona}. ¿Les interesaría ver una propuesta para tener presencia online profesional? 10 minutos esta semana, sin compromiso.\"\n};\n\nfunction getPitch(rubro, nombre, zona) {\n  const plantilla = PITCHES[rubro] || PITCHES[\"default\"];\n  return plantilla.replace(/\\{nombre\\}/g, nombre).replace(/\\{zona\\}/g, zona);\n}\n\n// Construir WhatsApp link\nlet waLink = '';\nif (lead.whatsapp) {\n  const pitch = getPitch(lead.rubro, lead.nombre, lead.zona);\n  waLink = `https://wa.me/${lead.whatsapp}?text=${encodeURIComponent(pitch)}`;\n} else if (lead.telefono) {\n  const digits = (lead.telefono || '').replace(/\\D/g, '');\n  let normalized = digits;\n  if (digits.length === 10 && digits.startsWith('0')) {\n    normalized = '549' + digits.substring(1);\n  } else if (digits.length === 10) {\n    normalized = '549' + digits;\n  } else if (digits.length === 7 || digits.length === 8) {\n    normalized = '54935' + digits;\n  }\n  if (normalized.length >= 7) {\n    const pitch = getPitch(lead.rubro, lead.nombre, lead.zona);\n    waLink = `https://wa.me/${normalized}?text=${encodeURIComponent(pitch)}`;\n  }\n}\n\nconst pitch = getPitch(lead.rubro, lead.nombre, lead.zona);\nconst pitchCorto = pitch.length <= 280 ? pitch : pitch.substring(0, 277) + '…';\n\nconst emoji = lead.prioridad === 'Alta' ? '🔥' : lead.prioridad === 'Media' ? '🟡' : '⚪';\n\nlet msg = `${emoji} <b>${lead.nombre}</b>\\n`;\nmsg += `📍 ${lead.rubro} en ${lead.zona}\\n`;\nif (lead.direccion) msg += `🏠 ${lead.direccion}\\n`;\nif (lead.telefono) msg += `📞 ${lead.telefono}\\n`;\nif (lead.webUrl) {\n  const urlCorta = lead.webUrl.length > 60 ? lead.webUrl.substring(0, 57) + '…' : lead.webUrl;\n  msg += `🌐 <a href=\"${lead.webUrl}\">${urlCorta}</a>\\n`;\n}\nif (lead.estadoWeb) msg += `📊 Web: ${lead.estadoWeb}\\n`;\nif (lead.redesSociales) msg += `📱 ${lead.redesSociales}\\n`;\nmsg += `\\n💬 <i>Pitch sugerido:</i>\\n${pitchCorto}\\n`;\nmsg += `\\n`;\nif (waLink) {\n  msg += `🟢 <a href=\"${waLink}\">Abrir WhatsApp con pitch listo</a>`;\n} else {\n  msg += `⚠️ Sin teléfono — buscalo en Google/IG`;\n}\n\nreturn [{\n  json: {\n    mensaje: msg,\n    lead_id: lead.id,\n    prioridad: lead.prioridad,\n    rubro: lead.rubro,\n    zona: lead.zona\n  }\n}];"
+      },
+      "id": "a1000001-0000-0000-0000-000000000012",
+      "name": "Construir Mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ $json.mensaje }}",
+        "parseMode": "HTML",
+        "disableWebPagePreview": true,
+        "additionalFields": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000020",
+      "name": "Enviar Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1540, 0],
+      "notes": "Cada lead se envía como mensaje separado con botón HTML a WhatsApp."
+    },
+    {
+      "parameters": {},
+      "id": "a1000001-0000-0000-0000-000000000030",
+      "name": "Volver al Loop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1760, 0]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [{ "node": "Cargar Config", "type": "main", "index": 0 }]
+      ]
+    },
+    "Cargar Config": {
+      "main": [
+        [{ "node": "Generar Combinaciones", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generar Combinaciones": {
+      "main": [
+        [{ "node": "Loop (1 rubro×zona por vez)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Loop (1 rubro×zona por vez)": {
+      "main": [
+        [{ "node": "Buscar en CRM", "type": "main", "index": 0 }]
+      ]
+    },
+    "Buscar en CRM": {
+      "main": [
+        [{ "node": "Expandir Leads", "type": "main", "index": 0 }]
+      ]
+    },
+    "Expandir Leads": {
+      "main": [
+        [{ "node": "Construir Mensaje", "type": "main", "index": 0 }]
+      ]
+    },
+    "Construir Mensaje": {
+      "main": [
+        [{ "node": "Enviar Telegram", "type": "main", "index": 0 }]
+      ]
+    },
+    "Enviar Telegram": {
+      "main": [
+        [{ "node": "Volver al Loop", "type": "main", "index": 0 }]
+      ]
+    },
+    "Volver al Loop": {
+      "main": [
+        [{ "node": "Loop (1 rubro×zona por vez)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "_docs": "Workflow simplificado para Paulero Studio. Solo requiere 3 env vars: CRM_BASE_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID. Sin Apify, sin Python. El CRM hace toda la búsqueda y dedup; n8n arma el mensaje y lo manda a Telegram.",
+  "_env_vars_required": [
+    "CRM_BASE_URL=https://tu-crm.vercel.app",
+    "TELEGRAM_BOT_TOKEN=8811084254:AAH-r9OCoeyzKNjyZzlDL6uouutuOsvywL4",
+    "TELEGRAM_CHAT_ID=7780475797"
+  ]
+}
