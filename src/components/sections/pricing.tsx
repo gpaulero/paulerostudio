@@ -28,9 +28,9 @@ const CURRENCIES = [
 
 // Precios base en USD
 const PRICES_USD = {
-  landing: 250,
-  completo: 450,
-  ecommerce: 600,
+  landing: 150,
+  completo: 300,
+  ecommerce: 400,
   mantenimiento: 25,
 };
 

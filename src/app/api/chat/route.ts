@@ -47,7 +47,7 @@ Presentalo como oferta exclusiva y urgente: "solo si cerramos ahora. Hacé click
 OTRAS OBJECIONES:
 - "Tengo que pensarlo" → "Entiendo, pero mientras pensás tu competencia ya está online. ¿Cuántos clientes perdés por no tener web profesional?"
 - "Puedo hacerlo yo" → "Claro, pero ¿cuánto tiempo te llevaría? Tu tiempo vale más. Nosotros lo tenemos listo en 1-2 semanas."
-- "Voy a ver otras opciones" → "Mirá, diseño a medida desde 250 USD con deploy incluido es difícil de igualar. Y acá hablás directo con el desarrollador, sin intermediarios."
+- "Voy a ver otras opciones" → "Mirá, diseño a medida desde 150 USD con deploy incluido es difícil de igualar. Y acá hablás directo con el desarrollador, sin intermediarios."
 
 PASO 5 — CERRAR: CADA respuesta debe derivar a WhatsApp. No esperes a que lo pida, VOS proponelo. NUNCA des el número de WhatsApp, SIEMPRE decile que haga click en el botón verde de WhatsApp que aparece a la derecha de la pantalla. Frases de cierre:
 - "Hacé click en el botón de WhatsApp a la derecha y hoy mismo empezamos a armar tu proyecto"
@@ -67,7 +67,7 @@ INFORMACIÓN DEL ESTUDIO:
 - Trato directo, sin agencias ni intermediarios — eso = mejores precios y comunicación directa
 
 PLANES Y PRECIOS:
-1. Landing Page — 250 USD (pago único, sin mensualidad)
+1. Landing Page — 150 USD (pago único, sin mensualidad)
    - Diseño a medida (NADA de templates genéricos)
    - Hasta 5 secciones
    - 100% responsive (se ve perfecto en celular)
@@ -76,7 +76,7 @@ PLANES Y PRECIOS:
    - Deploy en producción incluido
    - Entrega en 1 SEMANA
 
-2. Sitio Web Completo — 450 USD (pago único, sin mensualidad) ⭐ MÁS ELEGIDO
+2. Sitio Web Completo — 300 USD (pago único, sin mensualidad) ⭐ MÁS ELEGIDO
    - Todo lo de Landing Page
    - Secciones ilimitadas
    - Backend con base de datos
@@ -85,7 +85,7 @@ PLANES Y PRECIOS:
    - Integración con APIs
    - Entrega en 2-4 semanas
 
-3. E-commerce — 600 USD (pago único) + 25 USD/mes (mantenimiento de tienda)
+3. E-commerce — 400 USD (pago único) + 25 USD/mes (mantenimiento de tienda)
    - Todo lo del Sitio Web Completo
    - Catálogo de productos con filtros inteligentes
    - Carrito de compra
@@ -145,27 +145,27 @@ const RULES: { patterns: RegExp; response: string }[] = [
   {
     patterns: /\b(hola|buenas|hey|buen día|buenas tardes|buenas noches|qué tal|como estás|como andas)\b/i,
     response:
-      "Hola! Bienvenido a Paulero Studio. Te cuento rápido: hacemos webs profesionales a medida desde 250 USD, pago único. ¿Tenés un negocio o proyecto que necesite presencia online? Contame y te recomiendo el plan ideal."
+      "Hola! Bienvenido a Paulero Studio. Te cuento rápido: hacemos webs profesionales a medida desde 150 USD, pago único. ¿Tenés un negocio o proyecto que necesite presencia online? Contame y te recomiendo el plan ideal."
   },
   {
     patterns: /\b(precio|precios|cuánto|cuanto|cuesta|sale|valor|costo|presupuesto)\b/i,
     response:
-      "Antes de tirarte precios, contame: ¿qué tipo de negocio tenés? Así te recomiendo el plan exacto que necesitás. Pero te adelanto: arrancamos desde 250 USD pago único. ¿Qué estás buscando?"
+      "Antes de tirarte precios, contame: ¿qué tipo de negocio tenés? Así te recomiendo el plan exacto que necesitás. Pero te adelanto: arrancamos desde 150 USD pago único. ¿Qué estás buscando?"
   },
   {
     patterns: /\b(landing|landing page|una página|página simple|vitrina)\b/i,
     response:
-      "La **Landing Page** a 250 USD es perfecta si necesitás salir YA a internet. Diseño a medida, responsive, SEO, y la tenés lista en 1 semana. Pago único, sin sorpresas. ¿Querés que la tengamos online esta semana? Hacé click en el botón de WhatsApp a la derecha y arrancamos.",
+      "La **Landing Page** a 150 USD es perfecta si necesitás salir YA a internet. Diseño a medida, responsive, SEO, y la tenés lista en 1 semana. Pago único, sin sorpresas. ¿Querés que la tengamos online esta semana? Hacé click en el botón de WhatsApp a la derecha y arrancamos.",
   },
   {
     patterns: /\b(sitio web completo|sitio completo|web completo|intermedio)\b/i,
     response:
-      "El **Sitio Web Completo** a 450 USD es nuestro plan más elegido — y no es casualidad. Panel admin, backend, CMS, secciones ilimitadas. Vos manejás todo sin depender de nadie. Entrega en 2-4 semanas. Hacé click en el botón de WhatsApp a la derecha y te armamos tu proyecto a medida.",
+      "El **Sitio Web Completo** a 300 USD es nuestro plan más elegido — y no es casualidad. Panel admin, backend, CMS, secciones ilimitadas. Vos manejás todo sin depender de nadie. Entrega en 2-4 semanas. Hacé click en el botón de WhatsApp a la derecha y te armamos tu proyecto a medida.",
   },
   {
     patterns: /\b(e-?commerce|ecommerce|tienda|shop|vender|venta online|carrito|catálogo|pasarela|mercado pago)\b/i,
     response:
-      "Si querés vender online, el **E-commerce** a 600 USD + 25 USD/mes es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. La mensualidad es para el mantenimiento de la tienda. ¿Sabés cuántos clientes perdés por no vender online? Hacé click en el botón de WhatsApp a la derecha y lo charlamos."
+      "Si querés vender online, el **E-commerce** a 400 USD + 25 USD/mes es lo que necesitás. Catálogo, carrito, MercadoPago, gestión de stock — todo incluido. La mensualidad es para el mantenimiento de la tienda. ¿Sabés cuántos clientes perdés por no vender online? Hacé click en el botón de WhatsApp a la derecha y lo charlamos."
   },
   {
     patterns: /\b(mantenimiento|soporte|actualización|backup|seguridad|monitoreo)\b/i,
