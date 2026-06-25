@@ -53,6 +53,22 @@ function formatPrice(amount: number, currency: typeof CURRENCIES[number]): strin
   return `${currency.symbol}${formatted}`;
 }
 
+// Precio mensual de mantenimiento.
+// En ARS usamos $38.250 (tarifa fijada manualmente, refleja cotización
+// dolar blue). En el resto de las monedas se convierte desde los 25 USD base.
+const ARS_MAINTENANCE = 38250;
+
+function getMaintenanceMonthly(
+  currencyCode: string,
+  currency: typeof CURRENCIES[number],
+  convert: (usd: number) => number
+): string {
+  if (currencyCode === "ARS") {
+    return "$" + new Intl.NumberFormat("es-AR").format(ARS_MAINTENANCE);
+  }
+  return formatPrice(convert(PRICES_USD.mantenimiento), currency);
+}
+
 function Pricing() {
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [rates, setRates] = useState<ExchangeRates | null>(null);
@@ -100,7 +116,9 @@ function Pricing() {
     {
       name: "Sitio Web Completo",
       priceUSD: PRICES_USD.completo,
-      period: "pago único",
+      period: selectedCurrency === "USD"
+        ? "pago único + 25 USD/mes"
+        : `pago único + ${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes`,
       description: "Para negocios que necesitan más que una vitrina: funcionalidades reales y backend robusto.",
       features: [
         "Todo lo de Landing Page",
@@ -109,6 +127,9 @@ function Pricing() {
         "Panel de administración",
         "Contenido dinámico (CMS)",
         "Integración con APIs",
+        selectedCurrency === "USD"
+          ? "Mantenimiento incluido (25 USD/mes)"
+          : `Mantenimiento incluido (${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes)`,
         "2-4 semanas de entrega",
       ],
       highlight: true,
@@ -118,7 +139,7 @@ function Pricing() {
       priceUSD: PRICES_USD.ecommerce,
       period: selectedCurrency === "USD"
         ? "pago único + 25 USD/mes"
-        : `pago único + ${formatPrice(convert(PRICES_USD.mantenimiento), currency)}/mes`,
+        : `pago único + ${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes`,
       description: "Tienda online completa para vender 24/7 con pasarelas de pago y gestión de stock.",
       features: [
         "Todo lo de Sitio Web Completo",
@@ -129,7 +150,7 @@ function Pricing() {
         "Panel admin para productos",
         selectedCurrency === "USD"
           ? "Mantenimiento de tienda incluido (25 USD/mes)"
-          : `Mantenimiento de tienda incluido (${formatPrice(convert(PRICES_USD.mantenimiento), currency)}/mes)`,
+          : `Mantenimiento de tienda incluido (${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes)`,
         "4-6 semanas de entrega",
       ],
       highlight: false,
@@ -288,13 +309,17 @@ function Pricing() {
                   <h3 className="text-xl font-semibold">Mantenimiento & Soporte</h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     Actualizaciones, backups, monitoreo de rendimiento, seguridad y soporte técnico.
-                    Obligatorio para E-commerce, opcional para los demás planes.
+                    Incluido en Sitio Web Completo y E-commerce; opcional para Landing Page.
                   </p>
                 </div>
               </div>
               <div className="shrink-0 text-right">
                 <span className="text-2xl font-bold">
-                  {mounted ? formatPrice(convert(PRICES_USD.mantenimiento), currency) : "25 USD"}
+                  {mounted
+                    ? (selectedCurrency === "ARS"
+                        ? "$" + new Intl.NumberFormat("es-AR").format(ARS_MAINTENANCE)
+                        : formatPrice(convert(PRICES_USD.mantenimiento), currency))
+                    : "25 USD"}
                 </span>
                 <span className="text-sm text-muted-foreground">/mes</span>
                 {selectedCurrency !== "USD" && (
