@@ -23,7 +23,7 @@ function Projects() {
       description:
         "Tienda online completa para una empresa de computación. Catálogo dinámico con filtros avanzados, carrito de compra, pasarelas de pago integradas y un panel de administración robusto para gestionar productos, stock y pedidos. Diseñado para escalar.",
       image: "/project-compucity-real.png",
-      url: "https://my-project-eight-liard-96.vercel.app/",
+      url: "https://www.compucityonline.com",
       tags: ["E-commerce", "Backend Complejo", "Panel Admin", "Pagos Online"],
       tech: ["Next.js", "React", "Prisma", "PostgreSQL", "Tailwind CSS"],
       metrics: [
@@ -31,7 +31,7 @@ function Projects() {
         { label: "Categorías con filtros", value: "15+" },
         { label: "Carga inicial", value: "< 2s" },
       ],
-      status: "Fase final",
+      status: "En producción",
     },
     {
       title: "Etersomos",
@@ -39,7 +39,7 @@ function Projects() {
       description:
         "Sitio web para un emprendimiento de registros akáshicos, con un backend potente que permite gestionar reservas de sesiones, contenido dinámico y comunicación con clientes. Una experiencia digital que refleja la esencia del servicio espiritual.",
       image: "/project-etersomos-real.png",
-      url: "https://etersomos-iota.vercel.app/",
+      url: "https://www.etersomos.com",
       tags: ["Sitio Web", "Backend Personalizado", "Reservas", "Contenido Dinámico"],
       tech: ["Next.js", "React", "Prisma", "PostgreSQL", "Tailwind CSS"],
       metrics: [
@@ -47,7 +47,7 @@ function Projects() {
         { label: "Contenido dinámico", value: "CMS propio" },
         { label: "Carga inicial", value: "< 1.5s" },
       ],
-      status: "Entregado",
+      status: "En producción",
     },
   ];
 
@@ -94,7 +94,7 @@ function Projects() {
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    {/* Badge de estado (Fase final / Entregado) */}
+                    {/* Badge de estado (En producción / Entregado) */}
                     <div className="absolute top-4 right-4">
                       <span className="px-3 py-1 text-xs rounded-full bg-foreground/90 text-background font-medium">
                         {project.status}
