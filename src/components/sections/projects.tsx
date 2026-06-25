@@ -22,7 +22,7 @@ function Projects() {
       subtitle: "E-commerce de tecnología",
       description:
         "Tienda online completa para una empresa de computación. Catálogo dinámico con filtros avanzados, carrito de compra, pasarelas de pago integradas y un panel de administración robusto para gestionar productos, stock y pedidos. Diseñado para escalar.",
-      image: "/project-compucity-real.png",
+      image: "/project-compucity-v2.png",
       url: "https://www.compucityonline.com.ar",
       tags: ["E-commerce", "Backend Complejo", "Panel Admin", "Pagos Online"],
       tech: ["Next.js", "React", "Prisma", "PostgreSQL", "Tailwind CSS"],
