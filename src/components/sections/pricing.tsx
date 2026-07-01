@@ -1,376 +1,209 @@
 "use client";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// COMPONENTE: Pricing (Planes y precios)
+// COMPONENTE: Pricing (CTA + Addons)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Muestra precios con selector de moneda (USD, ARS, MXN, COP, CLP,
-// BRL, UYU, PEN). Las cotizaciones se obtienen en tiempo real desde
-// /api/exchange y se cachean por 1 hora.
+// Sección sin precios públicos. Cada proyecto es único, así que
+// el cliente consulta directamente por WhatsApp. Debajo del CTA
+// principal se muestran dos addons opcionales (Mantenimiento &
+// Soporte y Chatbot con IA) también con botón "Consultar" que
+// abre WhatsApp con un mensaje pre-armado.
+//
+// NOTA: El endpoint /api/exchange y la lógica de cotización se
+// mantienen intactos en el código por si se vuelven a usar en
+// el futuro, pero no se muestran en la vista.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Shield, Bot, Globe } from "lucide-react";
+import { ArrowRight, Shield, Bot, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AnimatedSection from "./animated-section";
 
-// ─── Configuración de monedas ──────────────────────────────────
-const CURRENCIES = [
-  { code: "USD", label: "USD", flag: "🇺🇸", symbol: "$", decimals: 0 },
-  { code: "ARS", label: "ARS", flag: "🇦🇷", symbol: "$", decimals: 0 },
-  { code: "MXN", label: "MXN", flag: "🇲🇽", symbol: "$", decimals: 0 },
-  { code: "COP", label: "COP", flag: "🇨🇴", symbol: "$", decimals: 0 },
-  { code: "CLP", label: "CLP", flag: "🇨🇱", symbol: "$", decimals: 0 },
-  { code: "BRL", label: "BRL", flag: "🇧🇷", symbol: "R$", decimals: 0 },
-  { code: "UYU", label: "UYU", flag: "🇺🇾", symbol: "$", decimals: 0 },
-  { code: "PEN", label: "PEN", flag: "🇵🇪", symbol: "S/", decimals: 0 },
-];
+// ─── Configuración WhatsApp ─────────────────────────────────────
+// Mismo número que usan contact.tsx y whatsapp-button.tsx.
+const WHATSAPP_NUMBER = "5493517656918";
 
-// Precios base en USD
-const PRICES_USD = {
-  landing: 150,
-  completo: 300,
-  ecommerce: 400,
-  mantenimiento: 25,
+function buildWhatsAppLink(message: string): string {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+// Mensajes pre-armados por contexto — cada botón abre WhatsApp
+// con un texto distinto para que Gonzalo sepa de qué viene el lead.
+const WHATSAPP_MESSAGES = {
+  general: "Hola Gonzalo, vi tu portfolio y quiero consultar por un proyecto. ¿Podemos charlar?",
+  mantenimiento: "Hola Gonzalo, vi tu portfolio y me interesa el servicio de Mantenimiento & Soporte. ¿Me contás más?",
+  chatbot: "Hola Gonzalo, vi tu portfolio y me interesa agregar un Chatbot con IA a mi sitio. ¿Me contás más?",
 };
 
-interface ExchangeRates {
-  ARS: number;
-  MXN: number;
-  COP: number;
-  CLP: number;
-  BRL: number;
-  UYU: number;
-  PEN: number;
-  updated: string;
-}
-
-function formatPrice(amount: number, currency: typeof CURRENCIES[number]): string {
-  const formatted = new Intl.NumberFormat("es-AR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: currency.decimals,
-  }).format(Math.round(amount));
-  return `${currency.symbol}${formatted}`;
-}
-
-// Precio mensual de mantenimiento.
-// En ARS usamos $38.250 (tarifa fijada manualmente, refleja cotización
-// dolar blue). En el resto de las monedas se convierte desde los 25 USD base.
-const ARS_MAINTENANCE = 38250;
-
-function getMaintenanceMonthly(
-  currencyCode: string,
-  currency: typeof CURRENCIES[number],
-  convert: (usd: number) => number
-): string {
-  if (currencyCode === "ARS") {
-    return "$" + new Intl.NumberFormat("es-AR").format(ARS_MAINTENANCE);
-  }
-  return formatPrice(convert(PRICES_USD.mantenimiento), currency);
-}
-
 function Pricing() {
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
-  const [rates, setRates] = useState<ExchangeRates | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Fetch exchange rates
-    fetch("/api/exchange")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ARS) setRates(data);
-      })
-      .catch(() => {
-        // Silencioso — se quedan en USD
-      });
-  }, []);
-
-  // Convierte USD a la moneda seleccionada
-  const convert = (usd: number): number => {
-    if (selectedCurrency === "USD" || !rates) return usd;
-    const rate = rates[selectedCurrency as keyof ExchangeRates];
-    return typeof rate === "number" ? usd * rate : usd;
-  };
-
-  const currency = CURRENCIES.find((c) => c.code === selectedCurrency) || CURRENCIES[0];
-
-  const plans = [
-    {
-      name: "Landing Page",
-      priceUSD: PRICES_USD.landing,
-      period: "pago único",
-      description: "Ideal para emprendedores que necesitan presencia online rápida y profesional.",
-      features: [
-        "Diseño a medida (no templates)",
-        "Hasta 5 secciones",
-        "100% responsive (mobile + desktop)",
-        "SEO básico optimizado",
-        "Formulario de contacto / WhatsApp",
-        "Deploy en producción incluido",
-        "1 semana de entrega",
-      ],
-      highlight: false,
-    },
-    {
-      name: "Sitio Web Completo",
-      priceUSD: PRICES_USD.completo,
-      period: selectedCurrency === "USD"
-        ? "pago único + 25 USD/mes"
-        : `pago único + ${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes`,
-      description: "Para negocios que necesitan más que una vitrina: funcionalidades reales y backend robusto.",
-      features: [
-        "Todo lo de Landing Page",
-        "Secciones ilimitadas",
-        "Backend con base de datos",
-        "Panel de administración",
-        "Contenido dinámico (CMS)",
-        "Integración con APIs",
-        selectedCurrency === "USD"
-          ? "Mantenimiento incluido (25 USD/mes)"
-          : `Mantenimiento incluido (${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes)`,
-        "2-4 semanas de entrega",
-      ],
-      highlight: true,
-    },
-    {
-      name: "E-commerce",
-      priceUSD: PRICES_USD.ecommerce,
-      period: selectedCurrency === "USD"
-        ? "pago único + 25 USD/mes"
-        : `pago único + ${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes`,
-      description: "Tienda online completa para vender 24/7 con pasarelas de pago y gestión de stock.",
-      features: [
-        "Todo lo de Sitio Web Completo",
-        "Catálogo de productos con filtros",
-        "Carrito de compra",
-        "Pasarelas de pago (MercadoPago, etc.)",
-        "Gestión de stock y pedidos",
-        "Panel admin para productos",
-        selectedCurrency === "USD"
-          ? "Mantenimiento de tienda incluido (25 USD/mes)"
-          : `Mantenimiento de tienda incluido (${getMaintenanceMonthly(selectedCurrency, currency, convert)}/mes)`,
-        "4-6 semanas de entrega",
-      ],
-      highlight: false,
-    },
-  ];
-
   return (
     <AnimatedSection
       id="pricing"
       className="py-24 sm:py-32 border-t border-border"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-2xl">
+        {/* ─── CTA principal ─────────────────────────────────────── */}
+        <div className="max-w-3xl">
           <p className="text-sm font-mono text-muted-foreground mb-3">
-            Planes / Precios
+            Trabajemos juntos
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-            Inversión
+            Cada proyecto
             <br />
-            <span className="text-muted-foreground">transparente</span>
+            <span className="text-muted-foreground">es único.</span>
           </h2>
-          <p className="mt-6 text-muted-foreground leading-relaxed">
-            Precios orientativos. Cada proyecto es único, así que el precio
-            final se ajusta según tus necesidades. Sin sorpresas ni costos
-            ocultos — sabés exactamente qué estás pagando antes de empezar.
+          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+            No creo en precios enlatados. Una landing para una panadería no es
+            lo mismo que una para un estudio jurídico, y un e-commerce con 50
+            productos no se cotiza igual que uno con 5.000. Contame qué
+            necesitás y te armo una propuesta a medida, sin compromiso.
           </p>
+
+          {/* CTA WhatsApp grande */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mt-10 flex flex-col sm:flex-row gap-4"
+          >
+            <Button
+              size="lg"
+              className="rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 h-14 px-8 text-base"
+              asChild
+            >
+              <a
+                href={buildWhatsAppLink(WHATSAPP_MESSAGES.general)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="mr-2 w-5 h-5" />
+                Charlemos por WhatsApp
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </a>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full h-14 px-8 text-base"
+              asChild
+            >
+              <a href="#contact">
+                Ver otras formas de contacto
+              </a>
+            </Button>
+          </motion.div>
+
+          {/* Trust signals */}
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              Respuesta en menos de 24hs
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-foreground/40" />
+              Presupuesto sin compromiso
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-foreground/40" />
+              Consulta inicial gratis
+            </span>
+          </div>
         </div>
 
-        {/* Selector de moneda */}
-        {mounted && (
-          <div className="mt-10 flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Globe className="w-4 h-4" />
-              <span>Ver precios en:</span>
-            </div>
-            <div className="relative">
-              <select
-                value={selectedCurrency}
-                onChange={(e) => setSelectedCurrency(e.target.value)}
-                className="appearance-none bg-card/50 border border-border/50 text-foreground text-sm rounded-lg pl-3 pr-8 py-2 hover:border-foreground/30 focus:outline-none focus:border-foreground/50 transition-colors cursor-pointer"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.flag} {c.code} — {c.label}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ─── Addons opcionales ────────────────────────────────── */}
+        <div className="mt-20">
+          <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span className="text-muted-foreground font-mono text-sm">+ Addons</span>
+          </h3>
 
-        {/* Nota de cotización */}
-        {mounted && selectedCurrency !== "USD" && rates && (
-          <p className="mt-3 text-xs text-muted-foreground">
-            Cotización aproximada actualizada al {new Date(rates.updated).toLocaleDateString("es-AR")}. El precio final se confirma al momento de contratar.
-          </p>
-        )}
-
-        {/* Grid de 3 columnas para los planes */}
-        <div className="mt-10 grid md:grid-cols-3 gap-6">
-          {plans.map((plan, i) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Mantenimiento & Soporte */}
             <motion.div
-              key={plan.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
+              transition={{ duration: 0.5 }}
             >
-              <Card className={`h-full transition-all duration-300 ${
-                plan.highlight
-                  ? "bg-card border-foreground/30 shadow-lg shadow-foreground/5"
-                  : "bg-card/50 border-border/50 hover:border-foreground/20"
-              }`}>
+              <Card className="h-full bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
                 <CardContent className="p-8 flex flex-col h-full">
-                  {/* Badge "Popular" en el plan destacado */}
-                  {plan.highlight && (
-                    <span className="self-start px-3 py-1 text-xs rounded-full bg-foreground text-background font-medium mb-4">
-                      Más elegido
-                    </span>
-                  )}
-
-                  <h3 className="text-xl font-semibold">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 mb-6">
-                    {plan.description}
-                  </p>
-
-                  {/* Precio */}
-                  <div className="mb-6">
-                    <span className="text-3xl font-bold">
-                      {formatPrice(convert(plan.priceUSD), currency)}
-                    </span>
-                    <span className="text-sm text-muted-foreground ml-1">
-                      {selectedCurrency !== "USD" ? `${currency.label}` : ""} {plan.period}
-                    </span>
-                    {selectedCurrency !== "USD" && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        ≈ {plan.priceUSD} USD
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
+                      <Shield className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-semibold">Mantenimiento & Soporte</h4>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Actualizaciones, backups automáticos, monitoreo de
+                        rendimiento, parches de seguridad y soporte técnico
+                        prioritario. Tu sitio siempre rápido, seguro y al día.
+                        Opcional para Landing Page, incluido en proyectos
+                        completos y e-commerce.
                       </p>
-                    )}
+                    </div>
                   </div>
-
-                  {/* Lista de features con checks */}
-                  <div className="space-y-3 flex-1 mb-8">
-                    {plan.features.map((feature) => (
-                      <div
-                        key={feature}
-                        className="flex items-start gap-2.5 text-sm text-muted-foreground"
-                      >
-                        <Check className="w-4 h-4 text-foreground/70 shrink-0 mt-0.5" />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Botón CTA del plan */}
+                  <div className="flex-1" />
                   <Button
-                    className={`rounded-full w-full ${
-                      plan.highlight
-                        ? ""
-                        : "bg-foreground/10 text-foreground hover:bg-foreground/20"
-                    }`}
-                    variant={plan.highlight ? "default" : "outline"}
+                    variant="outline"
+                    className="rounded-full w-full sm:w-auto sm:self-start"
                     asChild
                   >
-                    <a href="#contact">
+                    <a
+                      href={buildWhatsAppLink(WHATSAPP_MESSAGES.mantenimiento)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MessageCircle className="mr-2 w-4 h-4" />
                       Consultar
-                      <ArrowRight className="ml-2 w-4 h-4" />
                     </a>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
-          ))}
+
+            {/* Chatbot con IA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
+              <Card className="h-full bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
+                <CardContent className="p-8 flex flex-col h-full">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
+                      <Bot className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-semibold">Chatbot con IA</h4>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Un asistente virtual que atiende consultas 24/7 en tu
+                        sitio, informa sobre tus servicios, califica leads y
+                        deriva a WhatsApp para cerrar ventas. Un vendedor que
+                        nunca duerme, integrado a cualquier plan.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex-1" />
+                  <Button
+                    variant="outline"
+                    className="rounded-full w-full sm:w-auto sm:self-start"
+                    asChild
+                  >
+                    <a
+                      href={buildWhatsAppLink(WHATSAPP_MESSAGES.chatbot)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MessageCircle className="mr-2 w-4 h-4" />
+                      Consultar
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
-
-        {/* Card de mantenimiento — separada porque es mensual */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-8"
-        >
-          <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
-            <CardContent className="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Mantenimiento & Soporte</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Actualizaciones, backups, monitoreo de rendimiento, seguridad y soporte técnico.
-                    Incluido en Sitio Web Completo y E-commerce; opcional para Landing Page.
-                  </p>
-                </div>
-              </div>
-              <div className="shrink-0 text-right">
-                <span className="text-2xl font-bold">
-                  {mounted
-                    ? (selectedCurrency === "ARS"
-                        ? "$" + new Intl.NumberFormat("es-AR").format(ARS_MAINTENANCE)
-                        : formatPrice(convert(PRICES_USD.mantenimiento), currency))
-                    : "25 USD"}
-                </span>
-                <span className="text-sm text-muted-foreground">/mes</span>
-                {selectedCurrency !== "USD" && (
-                  <p className="text-xs text-muted-foreground">≈ 25 USD/mes</p>
-                )}
-                <Button
-                  variant="outline"
-                  className="rounded-full ml-4"
-                  asChild
-                >
-                  <a href="#contact">Consultar</a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Card de chatbot con IA — addon para cualquier plan */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="mt-4"
-        >
-          <Card className="bg-card/50 border-border/50 hover:border-foreground/20 transition-all duration-300">
-            <CardContent className="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-foreground/5 shrink-0">
-                  <Bot className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Chatbot con IA</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Un asistente virtual que atiende consultas 24/7, informa sobre tus servicios, califica leads y deriva a WhatsApp para cerrar ventas. Se suma a cualquier plan.
-                  </p>
-                </div>
-              </div>
-              <div className="shrink-0 text-right">
-                <span className="text-sm text-muted-foreground">Incluido en todos los planes</span>
-                <Button
-                  variant="outline"
-                  className="rounded-full ml-4"
-                  asChild
-                >
-                  <a href="#contact">Consultar</a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
       </div>
     </AnimatedSection>
   );
