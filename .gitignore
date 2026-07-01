@@ -53,3 +53,12 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Prospección informática — scripts con tokens de Telegram hardcoded (no commitear)
+# Usar .env para TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID
+scripts/prospeccion_informatica*.py
+scripts/info_*.json
+scripts/info_zonas_faltantes.json
+
+# Screenshots de preview (workfiles)
+download/pricing-no-prices*.png
