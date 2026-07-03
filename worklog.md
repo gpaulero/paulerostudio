@@ -488,3 +488,68 @@ Stage Summary:
 - Remote URL limpio (sin PAT) después del push
 - Pendiente: testear el deploy en Vercel (auto-deploy debería activarse)
 - Pendiente: 1 commit UUID colado en el historial (solo cambios de permisos, inofensivo)
+
+---
+Task ID: DEMOS-1
+Agent: full-stack-developer
+Task: Build 3 portfolio demo Next.js pages for Paulero Studio
+
+Work Log:
+- Leí worklog.md y projects.tsx para entender contexto (portfolio existente + 3 demos image-only que había que reemplazar por demos multi-página reales).
+- Verifiqué las 12 fotos en /public/demos/ (parrilla-hero/food/interior, law-office/attorney-1..3, cabin-hero/interior-1..2).
+- Creé estructura de carpetas src/app/demos/{parrilla-la-esquina,estudio-fernandez-romero,cabanas-del-lago}/ con _components/ para Nav, Footer, DemoBanner y WhatsAppFloat en cada una.
+- Cada demo tiene su propio layout.tsx que carga fuentes custom con next/font/google y un wrapper con inline styles (background, color, fontFamily) que sobreescribe el dark theme del root layout.
+
+DEMO 1 — Parrilla La Esquina (Villa Carlos Paz):
+- layout.tsx: Playfair Display (headings) + Inter (body), background #F5EDE3, color #1A1614.
+- _components/nav.tsx: top bar con dirección+horarios+teléfono, sticky nav con logo flame icon + "La Esquina" Playfair, links Inicio/Menú/Reservas/Contacto, botón "Reservar mesa". Mobile hamburger menu. Active state con underline animado.
+- _components/footer.tsx: 4 columnas (brand+redes / nav / horarios / contacto) + bottom bar con copyright.
+- _components/demo-banner.tsx: banner negro con link a paulerostudio.com + WhatsApp Gonzalo (5493517656918) con texto pre-armado "parrilla".
+- _components/whatsapp-float.tsx: botón verde WhatsApp flotante, aparece después de scroll.
+- page.tsx (home): hero full-screen con parrilla-hero-1.jpg, "1998" badge, sección "Nuestra historia" (3 párrafos reales + foto interior con badge año), sección "Especialidades" (4 cards con foto+precio en pesos + descripción), sección "El ambiente" (foto + 3 stats), sección horarios/ubicación/contacto (3 cards), CTA final.
+- menu/page.tsx: hero con bg parrilla-hero-2, sticky tabs por categoría (Entradas/Parrilla/Pastas/Postres/Bebidas) con 4-6 ítems cada una, nombre+descripción+precio, badge "Recomendado" en algunos, notas al pie, CTA "Hacer pedido por WhatsApp".
+- reservas/page.tsx: hero con bg interior, formulario completo (nombre/teléfono/fecha/hora/personas/mensaje) con Field component, estado "enviado" con confirmación + link WhatsApp pre-armado, sidebar con horarios+contacto+CTA.
+- contacto/page.tsx: hero, 2 columnas — info (dirección, horarios detallados, contacto directo) + iframe Google Maps embed de VCP + "Cómo llegar" + CTA reservar.
+
+DEMO 2 — Estudio Fernández & Romero (sin refs locales):
+- layout.tsx: Cormorant Garamond (headings) + Inter (body), background #FAFAF7, color #0F2A47.
+- _components/nav.tsx: top bar con teléfono+email+"Consulta gratuita", sticky nav con Scale icon + "Fernández & Romero" Cormorant + tagline "Abogados · Desde 1999", links Inicio/Áreas/Equipo/Contacto, botón "Agendar consulta".
+- _components/footer.tsx: 4 columnas (brand con cita jurídica / áreas / estudio / contacto) — sin direcciones físicas, "Atendemos en toda la región".
+- _components/demo-banner.tsx: WhatsApp Gonzalo con texto "estudio".
+- _components/whatsapp-float.tsx: botón navy con "Consulta gratuita".
+- page.tsx (home): hero con law-office-1.jpg + título "Defendemos tus derechos con experiencia y compromiso", bottom strip con stats, sección "Áreas de práctica" (6 cards con icono Lucide por área: Laboral/Civil/Penal/Comercial/Familia/Sucesiones), sección "Por qué elegirnos" (3 stats grandes 25+/500+/98% + 2 cards Confidencialidad y Respuesta rápida), sección "Equipo" preview (3 attorney fotos), sección "Testimonios" (3 quotes anónimos), CTA final.
+- areas-de-practica/page.tsx: hero, listado de las 6 áreas con tagline+descripción de 1 párrafo + lista de "incluye" (6 sub-items cada una) + botones "Consultar este caso" y "WhatsApp" con mensaje pre-armado por área.
+- equipo/page.tsx: hero, 3 perfiles completos (Dr. Ricardo Fernández socio fundador laboral, Dra. Laura Romero socia civil/familia, Dr. Martín Aguirre asociado senior penal) con foto+matrícula inventada plausible+bio 1 párrafo+formación 4 items+áreas+CTA "Consultar con Dr./Dra. X".
+- contacto/page.tsx: hero, formulario (nombre/email/teléfono/área del caso select/mensaje) con confirmación y WhatsApp, sidebar con contacto directo+horarios+CTA.
+
+DEMO 3 — Cabañas del Lago (Valle de Punilla):
+- layout.tsx: Inter (body) + Caveat (accent script), background #F4F0E8, color #2D4A3E.
+- _components/nav.tsx: top bar con teléfono+"Reservá directo sin comisiones" en Caveat, sticky nav con Home icon + "Cabañas del Lago" en Caveat + tagline "Valle de Punilla · Córdoba", links Inicio/Cabañas/Tarifas/Contacto, botón "Consultar disponibilidad".
+- _components/footer.tsx: 4 columnas (brand+redes / nav / cabañas / contacto con horarios recepción).
+- _components/demo-banner.tsx: WhatsApp Gonzalo con texto "cabanas".
+- _components/whatsapp-float.tsx: botón verde WhatsApp con "Consultar disponibilidad".
+- page.tsx (home): hero full-screen con cabin-hero-1.jpg + título "Tu escapada al Valle de Punilla" con "Valle de Punilla" en Caveat naranja, sección "Por qué elegirnos" (4 features con icono: Frente al lago / Wifi alta velocidad / Desayuno incluido / Aceptamos mascotas), sección "Nuestras cabañas" (3 cards: del Bosque $45.000 / del Lago $65.000 / Familiar $85.000 con capacidad, precio, badge highlight, foto), sección "Qué ofrecemos" (foto + 6 amenities grid), sección reseñas (3 testimonios plausibles nombres argie), sección ubicación con iframe + descripción + CTA, CTA final naranja.
+- cabanas/page.tsx: hero, 3 cabañas en detalle — cada una con galería de 3 fotos (1 grande + 2 pequeñas), specs (huéspedes/dormitorios/baños/m²), descripción de 1 párrafo, lista de amenities con check, card precio+CTA "Reservar esta cabaña" + WhatsApp.
+- tarifas/page.tsx: hero, tabla de tarifas desktop (cabaña × capacidad × Baja/Media/Alta) + versión mobile con cards, sección "Temporadas" (3 cards), sección "Política de cancelación" (3 cards: Reserva / Cancelaciones / Check-in-out), sección "Formas de pago" (5 métodos + garantía mejor precio), CTA.
+- contacto/page.tsx: hero, formulario (nombre/email/teléfono/fechas/personas/cabaña deseada select/mensaje) con confirmación y WhatsApp, sidebar contacto+recepción+CTA tarifas, iframe mapa Valle de Punilla al final.
+
+PORTFOLIO UPDATE:
+- src/components/sections/projects.tsx: cambiados los 3 url de wa.me/...text=... a "/demos/parrilla-la-esquina", "/demos/estudio-fernandez-romero", "/demos/cabanas-del-lago".
+- Cambiado el texto del botón de "Quiero algo similar" a "Ver demo en vivo" para los 3 proyectos con status "Demo".
+- Los 2 proyectos reales (Compucity, Etersomos) quedaron intactos con su "Ver sitio".
+
+CALIDAD Y VERIFICACIÓN:
+- TypeScript: `npx tsc --noEmit --project tsconfig.json` — 0 errores en src/. Únicos errores remanentes son preexistentes en examples/websocket/* y skills/* (no míos).
+- ESLint: `npx eslint src/app/demos/ src/components/sections/projects.tsx` — 0 errores. Tuve que refactorizar los 3 nav.tsx porque React 19 lint rule "react-hooks/set-state-in-effect" rechazaba el `useEffect(() => setOpen(false), [pathname])` pattern. Lo reemplacé por `onClick={() => setOpen(false)}` en cada Link del mobile menu (más idiomático).
+- Corregí un bug en cabanas/cabanas/page.tsx donde el Spec component estaba tipado como `React.ComponentType<{className?: string}>` pero recibía `style` prop — cambié el tipo a `LucideIcon` importado de lucide-react.
+- Corregí imports sin usar (X, PawPrint, Wifi, Sun, Car, Tv, Wind, UtensilsCrossed) en cabanas/cabanas y tarifas.
+- Corregí un typo "estadia延长ada" con caracteres no latinos por "estadía prolongada".
+- Corregí un parrafo duplicado "desayuno incluido, desayuno incluido" en el hero de cabanas.
+
+Stage Summary:
+- 26 archivos creados en src/app/demos/{3 demos}/ (3 layouts + 12 page.tsx + 9 _components + 2 ya existían). Estructura por demo: layout.tsx, page.tsx (home), 3 subpáginas, y _components/{nav,footer,demo-banner,whatsapp-float}.tsx.
+- 1 archivo modificado: src/components/sections/projects.tsx (URLs y texto de botón).
+- Cada demo es visualmente independiente (fuentes, paleta, layout propios) y no hereda el dark theme del sitio principal gracias al wrapper con inline styles.
+- Todos los CTAs de reservas/consultas/pedidos usan WhatsApp con mensajes pre-armados y teléfonos inventados plausibles (parrilla 5493541123456, estudio 541143215678, cabanas 5493541678900).
+- El banner demo obligatorio al pie de cada página apunta a wa.me/5493517656918 (Gonzalo real) con texto pre-armado por rubro.
+- TypeScript y ESLint limpios para src/. Listo para commit por el parent agent.

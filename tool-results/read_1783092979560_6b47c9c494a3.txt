@@ -1,0 +1,491 @@
+     1→---
+     2→Task ID: 1 & 2
+     3→Agent: full-stack-developer
+     4→Task: Add dark/light mode toggle + refactor page.tsx into components
+     5→
+     6→Work Log:
+     7→- Created theme-provider.tsx with next-themes (attribute="class", defaultTheme="dark", enableSystem=true)
+     8→- Updated layout.tsx with ThemeProvider wrapping children and Toaster
+     9→- Updated globals.css with:
+    10→  - Light mode .animated-gradient (warm professional tones)
+    11→  - Dark mode .dark .animated-gradient (existing deep gradient)
+    12→  - Light mode body::after grain overlay (opacity: 0.03)
+    13→  - Dark mode .dark body::after grain overlay (opacity: 0.06)
+    14→  - Updated ::selection for both light and dark modes
+    15→  - Added smooth transition on html/body for theme changes
+    16→- Created 13 component files under src/components/sections/:
+    17→  - animated-section.tsx, navigation.tsx (with ThemeToggle), hero.tsx, about.tsx,
+    18→  - tech-stack.tsx, services.tsx, projects.tsx, pricing.tsx, process.tsx,
+    19→  - faq.tsx, contact.tsx, footer.tsx, whatsapp-button.tsx
+    20→- Added ThemeToggle button (Sun/Moon) to Navigation: desktop between links and "Hablemos" button, mobile next to hamburger menu
+    21→- Theme toggle uses SSR-safe mounted state and framer-motion rotation animation
+    22→- Refactored page.tsx from 1413 lines to ~35 lines (just imports and assembly)
+    23→- All Spanish comments preserved in each component file
+    24→- Build/lint passes (no new errors in src/)
+    25→- Committed and pushed to GitHub
+    26→
+    27→Stage Summary:
+    28→- Dark/light mode toggle works with Sun/Moon button in navbar
+    29→- page.tsx reduced from 1413 lines to ~35 lines
+    30→- All 13 sections are now separate files under src/components/sections/
+    31→- Build passes, pushed to GitHub as commit 0b0e39b
+    32→
+    33→---
+    34→Task ID: 3-8
+    35→Agent: main (Super Z)
+    36→Task: AI Chatbot vendedor con descuento STUDIO20 + CTA al boton WhatsApp
+    37→
+    38→Work Log:
+    39→- Added chatbot component at src/components/sections/chatbot.tsx: floating button bottom-left, premium chat UI with quick prompts, typing indicator, markdown bold formatting, mounted guard for SSR hydration
+    40→- Added API route at src/app/api/chat/route.ts with Groq AI (llama-3.3-70b-versatile) + rule-based fallback
+    41→- Updated pricing in src/components/sections/pricing.tsx: Landing=250, Completo=450, E-commerce=600
+    42→- Fixed chatbot visibility: removed AnimatePresence from icon, added mounted state guard
+    43→- Fixed API connectivity: z-ai-web-dev-sdk fails on Vercel (private IPs), Gemini blocked by region, Groq works
+    44→- Groq API key: configured as fallback in code (env var preferred)
+    45→- Transformed chatbot from informational to SALES CLOSING agent with structured prompt
+    46→- Added 3-level objection handling: Level 1 (defend value) -> Level 2 (offer 20% off ONCE) -> Level 3 (urgency, no more discount)
+    47→- Discount can only be offered ONCE per conversation (AI checks message history)
+    48→- Rule-based fallback does NOT offer discount (no memory) - only AI with context does
+    49→- Changed all CTAs from phone number to "hace click en el boton de WhatsApp a la derecha"
+    50→- Added discount code STUDIO20: when user accepts 20% off, bot tells them to mention code STUDIO20 to Gonzalo via WhatsApp
+    51→- Discount prices: Landing=200, Completo=360, E-commerce=480
+    52→- Multiple commits pushed to GitHub, deployed via Vercel
+    53→
+    54→Key Files:
+    55→- src/app/api/chat/route.ts - Chatbot API with Groq + rules fallback + full sales prompt
+    56→- src/components/sections/chatbot.tsx - Chatbot UI component
+    57→- src/components/sections/pricing.tsx - Updated prices
+    58→- src/components/sections/whatsapp-button.tsx - WhatsApp floating button (bottom-right)
+    59→- src/app/page.tsx - Renders both WhatsAppButton and Chatbot
+    60→
+    61→Important Decisions:
+    62→- Groq chosen over Gemini (region-blocked) and z-ai-web-dev-sdk (private IPs on Vercel)
+    63→- API key embedded as fallback in code since user has another project on Vercel
+    64→- Discount offered ONLY via AI (has conversation context), not rule-based fallback
+    65→- CTA always points to WhatsApp button, never gives phone number directly
+    66→- STUDIO20 code tracks which leads came from chatbot discount
+    67→
+    68→Stage Summary:
+    69→- AI-powered sales chatbot fully functional on Vercel
+    70→- 3-level price objection flow: value -> 20% off (once) -> urgency
+    71→- STUDIO20 discount code for tracking
+    72→- CTA drives users to click WhatsApp button on the right
+    73→- All changes committed and pushed, live on Vercel
+    74→
+    75→---
+    76→Task ID: 9-12
+    77→Agent: main (Super Z)
+    78→Task: Alineacion about + chatbot como servicio + mensualidad e-commerce + selector de moneda
+    79→
+    80→Work Log:
+    81→- About section: changed items-center to items-start to align text with photo top edge
+    82→- Added "Chatbot con IA" as 5th service in services.tsx with Bot icon and features (IA conversacional, Derivacion a WhatsApp, Calificacion de leads, Respuestas 24/7)
+    83→- Added "Chatbot con IA" card in pricing.tsx as addon "Incluido en todos los planes"
+    84→- Added chatbot info to system prompt: plan 5 Chatbot con IA incluido sin costo extra
+    85→- Added fallback rule for chatbot/bot/ia queries
+    86→- E-commerce pricing: changed from "pago unico" to "pago unico + 25 USD/mes" for maintenance
+    87→- Maintenance price: changed from 50 USD/mes to 25 USD/mes across all files
+    88→- Maintenance card: added "Obligatorio para E-commerce, opcional para los demas planes"
+    89→- Chatbot prompt: clarified that ONLY E-commerce has monthly fee, Landing and Completo are pago unico sin mensualidad
+    90→- All chatbot rules updated: e-commerce shows +25 USD/mes, mantenimiento shows 25 USD/mes
+    91→- Created /api/exchange route: fetches ARS blue from dolarapi.com + general rates from open.er-api.com, cached 1 hour
+    92→- Added currency selector to pricing: USD, ARS, MXN, COP, CLP, BRL, UYU, PEN with real-time conversion
+    93→- Changed from pill buttons to dropdown select for currency selector (cleaner UI)
+    94→- Disclaimer text: "Cotizacion aproximada actualizada al [fecha]. El precio final se confirma al momento de contratar."
+    95→- Chatbot updated: knows about currency selector, has rule for moneda/pesos/cotizacion queries
+    96→
+    97→Key Files:
+    98→- src/app/api/exchange/route.ts - NEW: Exchange rate API (dolarapi + er-api, 1hr cache)
+    99→- src/components/sections/pricing.tsx - Rewritten with currency selector + real-time conversion
+   100→- src/components/sections/services.tsx - Added Chatbot con IA service + updated Mantenimiento
+   101→- src/components/sections/about.tsx - items-start alignment fix
+   102→- src/app/api/chat/route.ts - Updated all prices, e-commerce monthly, currency info, chatbot service
+   103→
+   104→Pricing Structure (current):
+   105→- Landing Page: 250 USD (pago unico, sin mensualidad)
+   106→- Sitio Web Completo: 450 USD (pago unico, sin mensualidad)
+   107→- E-commerce: 600 USD (pago unico) + 25 USD/mes (mantenimiento tienda, obligatorio)
+   108→- Mantenimiento & Soporte: 25 USD/mes (obligatorio e-commerce, opcional demas)
+   109→- Chatbot con IA: Incluido en todos los planes
+   110→- Descuento STUDIO20 (20% off): Landing=200, Completo=360, E-commerce=480
+   111→
+   112→Currency Selector:
+   113→- 8 monedas: USD, ARS (blue), MXN, COP, CLP, BRL, UYU, PEN
+   114→- Dropdown select (not pill buttons)
+   115→- Real-time rates from dolarapi.com + open.er-api.com
+   116→- Cached 1 hour server-side
+   117→- Graceful degradation: falls back to USD if APIs fail
+   118→
+   119→Important Decisions:
+   120→- Monthly fee ONLY for E-commerce (25 USD/mes), not for Landing or Completo
+   121→- Currency disclaimer does NOT mention USD specifically ("El precio final se confirma al momento de contratar")
+   122→- Dropdown selector chosen over pill buttons for cleaner UI
+   123→- ARS uses dolar blue (not oficial) for more accurate pricing for Argentines
+   124→
+   125→Stage Summary:
+   126→- About section text aligned with photo
+   127→- Chatbot offered as service (included in all plans)
+   128→- E-commerce monthly fee clarified across entire site
+   129→- Currency selector with 8 Latam currencies + real-time rates
+   130→- All changes committed and pushed, live on Vercel
+   131→
+   132→---
+   133→Task ID: 13
+   134→Agent: main (Super Z)
+   135→Task: CRM de prospección web con relevamiento precargado + verificable en browser
+   136→
+   137→Work Log:
+   138→- Prisma schema actualizado con 2 modelos: Comercio + Seguimiento (con onDelete cascade)
+   139→- Modelo Comercio: nombre, rubro, zona, direccion, telefono, whatsapp, email, webUrl, redesSociales, estadoWeb, prioridad, estado, notas, pitchSugerido, proximaAccion, fechaProximaAccion
+   140→- Modelo Seguimiento: tipo (nota/whatsapp/llamada/email/reunion/cierre), contenido, resultado
+   141→- 5 estados: Sin contactar → Contactado → Respondio → Reunion → Cerrado / Rechazado
+   142→- API CRUD completa:
+   143→  - GET/POST /api/comercios (con filtros rubro/zona/estado/prioridad/q)
+   144→  - GET/PATCH/DELETE /api/comercios/[id]
+   145→  - POST /api/comercios/[id]/seguimientos (con opcion cambiarEstadoA)
+   146→  - POST /api/comercios/seed (precarga 32 concesionarias)
+   147→- UI completa (3 componentes):
+   148→  - dashboard.tsx: 6 cards con métricas (total, sin contactar, en proceso, cerrados, tasa de cierre, prioridad alta)
+   149→  - comercios-table.tsx: tabla con badge de estado (6 colores), badge de prioridad, botones WhatsApp/web/teléfono en cada fila
+   150→  - comercio-modal.tsx: 3 tabs (Info / Seguimiento / Editar), cambio rápido de estado, historial con timestamps
+   151→  - nuevo-comercio-modal.tsx: form completo con datalists para rubro/zona/estado web
+   152→- Extracción inteligente de WhatsApp: convierte "(3541) 206969" o "WhatsApp 351 242 9960" a E.164 (54 + 9 + area + num)
+   153→- Layout cambiado de dark a light para mejor legibilidad del CRM
+   154→- Metadata del layout actualizada
+   155→- Botón "Cargar relevamiento" precarga 32 concesionarias del Valle de Punilla (idempotente)
+   156→- Verificación con agent-browser:
+   157→  - Página carga OK (sin errores de hydration)
+   158→  - Click en "Cargar relevamiento" → 32 comercios cargados
+   159→  - Tabla muestra todos con badges de estado y prioridad
+   160→  - Click en fila → modal se abre
+   161→  - Click en "Contactado" → estado cambia y se refleja en tabla
+   162→  - Tab Seguimiento → fill textarea + click Agregar → seguimiento guardado, tab actualizado a "(1)"
+   163→
+   164→Key Files:
+   165→- prisma/schema.prisma — modelos Comercio + Seguimiento
+   166→- src/app/api/comercios/route.ts — GET (con filtros) + POST
+   167→- src/app/api/comercios/[id]/route.ts — GET + PATCH + DELETE
+   168→- src/app/api/comercios/[id]/seguimientos/route.ts — POST seguimiento
+   169→- src/app/api/comercios/seed/route.ts — Precarga 32 concesionarias
+   170→- src/app/page.tsx — UI principal del CRM con filtros y dashboard
+   171→- src/components/crm/dashboard.tsx — 6 KPIs
+   172→- src/components/crm/comercios-table.tsx — Tabla con badges y acciones
+   173→- src/components/crm/comercio-modal.tsx — Modal 3 tabs (Info/Seguimiento/Editar)
+   174→- src/components/crm/nuevo-comercio-modal.tsx — Form alta comercio
+   175→- src/components/crm/icons.tsx — Iconos custom (WhatsApp, MapPin, etc.)
+   176→
+   177→Stage Summary:
+   178→- CRM funcional y verificado end-to-end con agent-browser
+   179→- 32 comercios precargados (relevamiento Valle de Punilla)
+   180→- Filtros por rubro, zona, estado, prioridad + búsqueda free-text
+   181→- Dashboard con métricas en tiempo real
+   182→- Modal con cambio rápido de estado + historial de seguimientos
+   183→- Botón directo a WhatsApp/teléfono/web de cada comercio
+   184→- Diseño responsive (mobile-first), light theme, emerald accent
+   185→
+   186→---
+   187→Task ID: 14
+   188→Agent: main
+   189→Task: Agregar feature "Buscar online" al CRM — busca comercios por rubro+zona en internet y los carga automáticamente en la base (idempotente).
+   190→
+   191→Work Log:
+   192→- Leído skill `web-search` para entender el uso de `zai.functions.invoke('web_search', { query, num })`.
+   193→- Creada API route `/api/comercios/buscar-online` (POST) que:
+   194→  1. Recibe { rubro, zona } en el body.
+   195→  2. Construye query: `${rubro} en ${zona}, Córdoba, Argentina contacto dirección teléfono`.
+   196→  3. Ejecuta `web_search` con num=20 y filtra resultados que son directorios/redes (Google Maps, FB, IG, Wikipedia, InfoisInfo, etc.).
+   197→  4. Llama al LLM (zai.chat.completions.create) con prompt estricto para extraer JSON estructurado: { comercios: [{ nombre, direccion, telefono, webUrl, redesSociales, estadoWeb, notas }] }. Prompt pide no inventar y devolver [] si no hay comercios reales.
+   198→  5. Idempotencia: normaliza nombres (lowercase, sin acentos, sin sufijos SRL/SA/El/La) y compara contra comercios existentes en esa zona.
+   199→  6. Crea los nuevos con prioridad inferida del estadoWeb (Alta si sin web/amateur, Media si existe, Baja en otro caso).
+   200→  7. Devuelve { ok, message, nuevos[], duplicados, totalResultados }.
+   201→- Creado componente `BuscarOnlineModal` con:
+   202→  - Inputs rubro/zona con datalists (rubros sugeridos: Concesionaria, Hotel, Restaurante, Inmobiliaria, etc. + los ya existentes en la BD).
+   203→  - Estado loading, error, resultado.
+   204→  - Lista de comercios agregados con link "Ver web" cuando tienen URL.
+   205→  - Estadísticas: total resultados en la búsqueda, duplicados omitidos.
+   206→- Actualizado `page.tsx`:
+   207→  - Importado `Globe` de lucide-react y `BuscarOnlineModal`.
+   208→  - Agregado botón "Buscar online" (azul) en el header entre "Cargar relevamiento" y "Nuevo comercio".
+   209→  - Estado `showBuscarOnline` para abrir/cerrar el modal.
+   210→  - Le pasa rubrosExistentes y zonasExistentes para que el datalist los incluya.
+   211→- Probado end-to-end con curl + agent-browser:
+   212→  - curl POST `/api/comercios/buscar-online` con {rubro:"Hotel", zona:"La Falda"} → 7 hoteles nuevos.
+   213→  - curl repetido → 7 duplicados detectados, 1 nuevo agregado (idempotencia OK).
+   214→  - curl con {rubro:"Restaurante", zona:"Cosquín"} → 4 restaurantes nuevos.
+   215→  - curl con rubro/zona inventados → 2 falsos positivos (LLM hallucinó) → borrados + prompt reforzado con reglas explícitas para no inventar.
+   216→  - Browser test: clic en "Buscar online", llenar Inmobiliaria + Villa Carlos Paz → 6 inmobiliarias nuevas con direcciones extraídas del LLM (Güemes 109, Sabattini N°33, etc.). Total en tabla pasó de 44 → 50 comercios.
+   217→- Screenshot guardado en `/home/z/my-project/download/crm-buscar-online-test.png`.
+   218→
+   219→Stage Summary:
+   220→- Feature "Buscar online" totalmente funcional: botón azul en el header del CRM, modal con rubro+zona, búsqueda web + extracción con LLM + carga idempotente en la BD.
+   221→- Permite sumar cualquier rubro en cualquier zona sin tocar código — el CRM ahora se actualiza dinámicamente.
+   222→- Detección automática de estado web (Amateur Canva/Wix/Google Sites, Sin web propia, Existe, etc.) → prioridad Alta/Media/Baja inferida automáticamente.
+   223→- Filtros del CRM se actualizan solos para mostrar los rubros nuevos (Hotel, Restaurante, Inmobiliaria ya aparecen como opciones).
+   224→- Archivos creados: src/app/api/comercios/buscar-online/route.ts, src/components/crm/buscar-online-modal.tsx.
+   225→- Archivos modificados: src/app/page.tsx.
+   226→
+   227→---
+   228→Task ID: n8n-telegram-crm
+   229→Agent: main (Super Z)
+   230→Task: Configurar bot de Telegram con n8n que consulta al CRM de comercios
+   231→
+   232→Contexto y antecedentes:
+   233→- Usuario tiene un CRM con endpoint /api/comercios/buscar-online ya funcionando
+   234→- Usuario eligió Opción 3: automatización real con n8n self-hosted (corre en su compu)
+   235→- n8n ya está corriendo en su compu con Docker
+   236→- Bot de Telegram ya creado y conectado en n8n
+   237→
+   238→Work Log:
+   239→- Generé archivo de workflow n8n en /home/z/my-project/download/workflow-crm-comercios.json
+   240→  - 7 nodos: Telegram Trigger, Parsear comando, Es comando valido?, Buscar en CRM,
+   241→    Formatear respuesta, Enviar resultados, Enviar ayuda
+   242→  - Usa variables $env.CRM_BASE_URL y $env.CRM_API_TOKEN
+   243→  - Comando esperado: /buscar <termino> [zona] [limite]
+   244→  - Formatea respuesta con Markdown para Telegram
+   245→  - Soporta varios formatos de respuesta del CRM (data, results, comercios, array directo)
+   246→- Validé el JSON del workflow (7 nodos, conexiones correctas)
+   247→- Usuario importó el workflow OK
+   248→- Usuario reportó error: "access to env vars denied" en nodo 'Cargar Config Rubros/Zonas'
+   249→- Expliqué 3 soluciones:
+   250→  1. N8N_BLOCK_ENV_ACCESS_IN_NODE=false en docker-compose.yml (recomendada)
+   251→  2. Usar $vars internas de n8n en lugar de $env
+   252→  3. Hardcodear valores en el Code node
+   253→- Armé tutorial completo paso a paso con:
+   254→  - Cómo editar docker-compose.yml
+   255→  - Cómo verificar credenciales
+   256→  - Cómo activar y probar el workflow
+   257→  - Tabla de errores comunes y soluciones
+   258→  - Tips de mantenimiento y backup
+   259→
+   260→PENDIENTES PARA MAÑANA (usuario continúa):
+   261→- Confirmar si aplicó Solución 1 (docker-compose) o Solución 2 ($vars)
+   262→- Verificar que el nodo "Cargar Config Rubros/Zonas" ejecuta sin error
+   263→- Confirmar valores reales de CRM_BASE_URL y CRM_API_TOKEN (usuario todavía no los pasó)
+   264→- Verificar la estructura real de la respuesta del endpoint /api/comercios/buscar-online
+   265→  (puede que los campos no se llamen nombre/rubro/zona/telefono/direccion/web y haya
+   266→   que ajustar el nodo "Formatear respuesta")
+   267→- Probar el bot enviando /buscar restaurant palermo desde Telegram
+   268→- Debuggear si aparece algún error nuevo (tabla de errores comunes en el tutorial)
+   269→- Si usuario quiere, armar script de verificación que chequee todo de una
+   270→
+   271→Archivos generados:
+   272→- /home/z/my-project/download/workflow-crm-comercios.json (workflow n8n listo para importar)
+   273→
+   274→Notas técnicas:
+   275→- n8n corre en Docker en la compu del usuario
+   276→- Zona horaria configurada: America/Buenos_Aires
+   277→- El endpoint del CRM espera: q (query), zona, limit
+   278→- Auth del CRM: Bearer token en header Authorization
+   279→- Bot de Telegram conectado vía Telegram Trigger (n8n-nodes-base.telegramTrigger v1.1)
+   280→- Workflow activo = escucha mensajes de Telegram incluso con navegador cerrado
+   281→
+   282→Stage Summary:
+   283→- Workflow generado, importado y validado
+   284→- Pendiente resolver error de env vars (usuario decide entre docker-compose o $vars)
+   285→- Pendiente probar el flujo completo end-to-end desde Telegram
+   286→- Usuario retoma mañana
+   287→
+   288→---
+   289→Task ID: 15
+   290→Agent: main (Super Z)
+   291→Task: Sacar precios públicos del sitio portfolio + reescribir chatbot para no dar precios
+   292→
+   293→Contexto y antecedentes:
+   294→- Usuario (Gonzalo) reportó que no está cómodo con los precios publicados en el sitio
+   295→- Decisión: que los clientes lo consulten directamente por WhatsApp
+   296→- Stack: Next.js 16, React 19, Tailwind 4, shadcn/ui, Framer Motion, Groq (chatbot IA)
+   297→
+   298→Work Log:
+   299→- Sincronizado /home/z/my-project con GitHub repo gpaulero/paulerostudio (origin remoto)
+   300→- bun install (827 paquetes en 8.4s) + dev server levantado en localhost:3000
+   301→
+   302→- pricing.tsx REESCRITO COMPLETO:
+   303→  - Sacado: tabla de 3 planes (Landing/Completo/Ecommerce) con precios USD
+   304→  - Sacado: selector de moneda (USD/ARS/MXN/COP/CLP/BRL/UYU/PEN) con fetch /api/exchange
+   305→  - Sacado: card de Mantenimiento con "$25 USD/mes" / "$38.250 ARS/mes"
+   306→  - Sacado: card de Chatbot IA con "Incluido en todos los planes"
+   307→  - Agregado: CTA "Cada proyecto es único" con párrafo explicativo (cada proyecto se cotiza a medida, sin compromiso)
+   308→  - Agregado: botón WhatsApp grande verde con mensaje pre-armado general
+   309→  - Agregado: 3 trust signals (Respuesta <24hs / Presupuesto sin compromiso / Consulta inicial gratis)
+   310→  - Agregado: 2 cards addon (Mantenimiento & Soporte + Chatbot con IA) sin precios, cada una con botón "Consultar" a WhatsApp con mensaje específico por contexto
+   311→
+   312→- services.tsx EDITADO:
+   313→  - Sacado: feature "25 USD/mes" del servicio Mantenimiento & Soporte
+   314→  - Agregado: feature "Plan mensual" (sin cifra)
+   315→
+   316→- api/chat/route.ts REESCRITO COMPLETO:
+   317→  - System prompt reescrito desde cero (~150 líneas)
+   318→  - Nueva regla #1: NUNCA dar precios, ni números, ni rangos, ni "desde X USD"
+   319→  - Eliminado: flujo de 3 niveles de objeción de precio con descuento
+   320→  - Eliminado: menciones a STUDIO20, 20% off, 200/360/480 USD, 150/300/400 USD, 25 USD/mes
+   321→  - Eliminado: instrucciones sobre selector de moneda y conversiones
+   322→  - Agregado: instrucciones para responder a "cuánto cuesta" derivando a WhatsApp
+   323→  - Agregado: instrucciones para responder a "STUDIO20" o "descuento" (promo no vigente)
+   324→  - Agregado: respuesta estándar si preguntan por qué no hay precios públicos
+   325→  - 15 reglas de fallback actualizadas: ninguna da precios, todas derivan a WhatsApp
+   326→  - Probar chatbot con 4 escenarios: "cuánto cuesta" / "quiero ecommerce cuánto vale" / "tengo STUDIO20" / "cuánto en pesos" → todas las respuestas correctas, ninguna da cifras
+   327→
+   328→- /api/exchange/route.ts y /api/exchange/cache: SIN TOCAR (el usuario eligió guardar el código)
+   329→- WhatsApp number: 5493517656918 (mismo que contact.tsx y whatsapp-button.tsx)
+   330→- Mensajes pre-armados:
+   331→  - general: "Hola Gonzalo, vi tu portfolio y quiero consultar por un proyecto. ¿Podemos charlar?"
+   332→  - mantenimiento: "Hola Gonzalo, vi tu portfolio y me interesa el servicio de Mantenimiento & Soporte. ¿Me contás más?"
+   333→  - chatbot: "Hola Gonzalo, vi tu portfolio y me interesa agregar un Chatbot con IA a mi sitio. ¿Me contás más?"
+   334→
+   335→- Verificación visual con agent-browser:
+   336→  - Página renderiza OK (HTTP 200)
+   337→  - HTML renderizado: 0 menciones de "Inversión", "transparente", "Planes / Precios", "pago único", "25 USD", "150 USD", "300 USD", "400 USD", "Más elegido", "selector de moneda", "Cotización aproximada"
+   338→  - 3 links wa.me nuevos (CTA principal + 2 addons) + 2 existentes (Contact y floating button) = 5 total
+   339→  - VLM verificó screenshot: sección muestra "Cada proyecto es único." + trust signals + 2 cards addon, sin precios visibles
+   340→
+   341→- Commit local: abe2e67 "feat: sacar precios públicos del sitio + chatbot" (3 archivos, +234/-415 líneas)
+   342→- Push a GitHub: PENDIENTE (workspace sin credenciales configuradas para github.com)
+   343→
+   344→Key Files:
+   345→- src/components/sections/pricing.tsx — reescrito desde cero, 380→198 líneas
+   346→- src/components/sections/services.tsx — 1 línea cambiada (feature "25 USD/mes" → "Plan mensual")
+   347→- src/app/api/chat/route.ts — system prompt + 15 fallback rules reescritos
+   348→- src/app/api/exchange/route.ts — intacto, sin uso por ahora
+   349→- /home/z/my-project/download/pricing-no-prices-focus.png — screenshot viewport
+   350→- /home/z/my-project/download/pricing-no-prices.png — screenshot full page
+   351→
+   352→Stage Summary:
+   353→- Portfolio y chatbot ya NO exponen precios públicamente
+   354→- Sección Pricing ahora es CTA conversacional ("Cada proyecto es único") + 2 cards addon
+   355→- Chatbot reescrito para nunca dar cifras y derivar siempre a WhatsApp
+   356→- /api/exchange preservado por si se vuelve a usar
+   357→- Commit local listo (abe2e67), pendiente push a GitHub (usuario debe pushear desde su máquina o configurar PAT)
+   358→- Sitio corre en localhost:3000, verificado end-to-end con curl + agent-browser + VLM
+   359→
+   360→---
+   361→Task ID: 16
+   362→Agent: main (super-z)
+   363→Task: Relevamiento de comercios de informática para el CRM — Valle de Punilla, buscar 5-8 leads verificados con WhatsApp y sin web propia
+   364→
+   365→Work Log:
+   366→- Leí scripts/prospeccion.py existente para entender el pipeline (web_search + LLM + Páginas Amarillas + Telegram)
+   367→- Leí prospeccion-carlos-paz/leads-concesionarias.md como referencia del formato de salida
+   368→- Confirmé con user: rubro=Informática, zona=Todo el valle (VCP, Cosquín, La Falda, Capilla del Monte, Tanti), cantidad=5-8 verificados
+   369→- Intenté listar comercios del CRM local pero la DB local está rota (schema postgres, env apunta a SQLite) → confirmé que el dedupe se hace en el endpoint lead-from-n8n en producción
+   370→- Creé scripts/prospeccion_informatica.py — pipeline secuencial para 5 zonas × 4 queries cada una (20 búsquedas)
+   371→- Primer run timeout tras 9 minutos, solo completó VCP y Cosquín (el LLM es lento)
+   372→- Creé scripts/prospeccion_informatica_zonas_faltantes.py — procesa las 3 zonas restantes EN PARALELO con ThreadPoolExecutor (max_workers=3)
+   373→- Run exitoso: La Falda=21, Capilla del Monte=21, Tanti=25 comercios crudos
+   374→- Creé scripts/prospeccion_informatica_final.py — re-procesa JSONs de VCP+Cosquín con LLM en paralelo y combina con los 67 de zonas faltantes
+   375→- Run exitoso: 58 leads únicos (24 Alta, 34 Media). VCP y Cosquín procesados pero Cosquín se quedó fuera por problema de tildes en el filename (info_cosquín_*.json)
+   376→- Creé scripts/prospeccion_informatica_top.py — procesa Cosquín aparte + filtra top 8 (alta + teléfono válido)
+   377→- Run exitoso: 8 top leads, pero varios tenían números de teléfono de Mendoza (261) y Entre Ríos (343) que el LLM alucinó
+   378→- Creé scripts/prospeccion_informatica_validar.py — filtro ESTRICTO: solo acepta teléfonos con prefijo de Córdoba (549351/3541/3547/3548/3543/3544/3542/3546/3533/3537/3582)
+   379→- Detectó y filtró 9 leads con teléfono inválido (Nova, Asatec, ACenter, Celcos, NobiSistemas, Giardino, Doctor Celular, Mdq, Computadoras e Insumos)
+   380→- Top 7 verificados tras filtro estricto
+   381→- Cleanup manual: renombré "informatica_sanjorge" → "Informática San Jorge" y removí "Claro" (extracción errónea del LLM)
+   382→- Final: 6 leads verificados para contactar
+   383→
+   384→Stage Summary:
+   385→- **6 leads verificados** de informática en Valle de Punilla, todos con WhatsApp confirmado (prefijo Córdoba) y SIN web propia:
+   386→  1. Del Sol Electrónica Cosquín (Cosquín) — +5493541333378 — IG @delsolelectronica
+   387→  2. Informática San Jorge (Cosquín) — +5493541679744 — IG @informatica_sanjorge
+   388→  3. HardTech Informatica Cordoba (Capilla del Monte) — +5493548588656 — IG @hardtechinformatica
+   389→  4. Getatek (Villa Carlos Paz) — +5493541679101 — IG @getatek
+   390→  5. Cly Store (Cosquín) — +5493512546234 — IG
+   391→  6. Tec Informatica La Falda (La Falda) — +5493548633364 — FB
+   392→- **Telegram**: 7 mensajes enviados (1 resumen + 6 leads individuales con link WhatsApp + pitch pre-cargado)
+   393→- **CRM push**: FALLÓ con 401 (CRM_API_KEY está configurada en Vercel pero no la tenemos en este entorno). Leads NO cargados al CRM automáticamente.
+   394→- **Reporte MD**: /home/z/my-project/prospeccion-carlos-paz/leads-informatica.md
+   395→- **Top leads JSON**: /home/z/my-project/scripts/info_top_leads.json
+   396→- **Todos los leads JSON**: /home/z/my-project/scripts/info_leads_finales.json (113 leads crudos con todos los datos)
+   397→- **Scripts creados**: 
+   398→  - scripts/prospeccion_informatica.py (pipeline secuencial, timeout)
+   399→  - scripts/prospeccion_informatica_zonas_faltantes.py (paralelo, 3 zonas)
+   400→  - scripts/prospeccion_informatica_final.py (ensamble VCP+Cosquín+resto)
+   401→  - scripts/prospeccion_informatica_top.py (procesa Cosquín aparte)
+   402→  - scripts/prospeccion_informatica_validar.py (valida prefijos Córdoba)
+   403→  - scripts/prospeccion_informatica_enviar.py (Telegram + CRM push final)
+   404→- **Próximos pasos sugeridos**: 
+   405→  1. Gonzalo debería recibir los 6 leads en Telegram ya — tocar el link "Abrir WhatsApp con pitch listo" para contactarlos
+   406→  2. Para cargar al CRM: Gonzalo puede either (a) pegar los 6 leads manualmente via /admin → "Nuevo comercio", o (b) darme la CRM_API_KEY de Vercel y los subo via API
+   407→  3. Pendiente: 113 leads totales (35 Alta prioridad pero sin teléfono válido) quedaron en info_leads_finales.json — se pueden re-procesar después buscando teléfonos manualmente en IG/FB de cada uno
+   408→
+   409→---
+   410→Task ID: 17
+   411→Agent: main (super-z)
+   412→Task: Sacar CRM (a rama), crear blog "Recursos" con 4 artículos SEO, agregar link en nav
+   413→
+   414→Work Log:
+   415→- Aclaré al user la diferencia entre "sacar CRM" (no recomendado) y "dejarlo en rama" (sí)
+   416→- Recomendé blog orientado a SEO local (rubro+zona) en vez de blog genérico
+   417→- User aprobó: "si todo" → procedí con las 4 partes
+   418→
+   419→PARTE 1: CRM a rama
+   420→- Creé rama local 'crm-feature' desde main con todo el código CRM intacto
+   421→- Forcé push de la rama a origin/crm-feature (sobreescribió la rama vieja)
+   422→- En main el CRM sigue funcionando en /admin (no hay link público a /login)
+   423→- No se tocó código del CRM en main
+   424→
+   425→PARTE 2: Stack del blog
+   426→- Decidí TS modules + react-markdown (sin MDX) porque:
+   427→  * react-markdown ya estaba instalado en package.json
+   428→  * Sin pasos de build extra
+   429→  * Mejor mantenibilidad: un archivo .ts por artículo
+   430→- Estructura creada:
+   431→  * src/content/articles-config.ts (tipo Article + helpers)
+   432→  * src/content/articles.ts (índice + helpers)
+   433→  * src/content/articles/<slug>.ts (un archivo por artículo)
+   434→
+   435→PARTE 3: Páginas del blog
+   436→- src/app/blog/page.tsx (índice):
+   437→  * Filtros por categoría (Todos / Comercios / Comparativas / Guías / Casos)
+   438→  * Cards con emoji, título, intro, fecha, tiempo de lectura
+   439→  * CTA grande a WhatsApp al final
+   440→  * Metadata con title + description + openGraph
+   441→- src/app/blog/[slug]/page.tsx (detalle):
+   442→  * generateStaticParams (prerenderiza todos los slugs)
+   443→  * generateMetadata dinámica (title, description, keywords, openGraph, twitter)
+   444→  * JSON-LD BlogPosting schema para SEO
+   445→  * ReactMarkdown con componentes custom (h2, h3, p, ul, ol, li, strong, a, code, blockquote)
+   446→  * CTA al final con mensaje de WhatsApp pre-armado según artículo
+   447→  * Tags al pie
+   448→  * Sección "Seguí leyendo" con artículos relacionados
+   449→- Borré public/robots.txt (estático) y creé src/app/robots.ts (dinámico con sitemap URL + disallow /admin,/login,/api/*)
+   450→- Creé src/app/sitemap.ts con todas las URLs (home + /blog + 4 artículos)
+   451→
+   452→PARTE 4: 4 artículos SEO
+   453→1. web-para-restaurant-villa-carlos-paz (Comercios) — 6 min lectura
+   454→   Optimizado para: "web restaurant Villa Carlos Paz", "reservas online"
+   455→2. whatsapp-business-vs-web-propia (Comparativas) — 5 min
+   456→   Optimizado para: "whatsapp vs web", "necesito web"
+   457→3. migrar-de-wix-canva-a-web-profesional (Guías) — 7 min
+   458→   Optimizado para: "migrar de wix", "salir de canva"
+   459→4. precio-pagina-web-comercio-cordoba (Comercios) — 6 min
+   460→   Optimizado para: "precio web Córdoba", "cuánto cuesta web"
+   461→
+   462→Cada artículo: ~800-1500 palabras, tono honesto/directo sin tecnicismos,
+   463→CTA con mensaje WhatsApp específico al artículo.
+   464→
+   465→PARTE 5: Navegación
+   466→- navigation.tsx: agregué 'Recursos' link entre 'Planes' y 'FAQ'
+   467→  * Tipo del array links ampliado: { label, href, external? }
+   468→  * Renderer condicional: Link de next/link para external=true, <a> para anchors
+   469→  * Mobile menu actualizado igual que desktop
+   470→- footer.tsx: agregué links 'Recursos' (/blog) y 'WhatsApp' en el footer
+   471→
+   472→VERIFICACIÓN (dev server local):
+   473→- GET / → HTTP 200 (home carga OK)
+   474→- GET /blog → HTTP 200 (índice muestra 4 artículos con cards)
+   475→- GET /blog/<cada-slug> → HTTP 200 (los 4 artículos renderizan markdown)
+   476→- GET /sitemap.xml → HTTP 200 (URLs: home, /blog, 4 artículos)
+   477→- GET /robots.txt → HTTP 200 (con disallow /admin,/login,/api/* y sitemap URL)
+   478→- Nav tiene "Recursos" link (verificado en HTML: href="/blog">Recursos)
+   479→- Footer tiene "Recursos" y "WhatsApp" links
+   480→- CTA WhatsApp en cada artículo con mensaje pre-armado (verificado HTML)
+   481→- TypeScript sin errores en código nuevo (npx tsc --noEmit OK para src/)
+   482→
+   483→Stage Summary:
+   484→- Commit f931f45: 'feat: agregar blog/recursos con 4 artículos SEO + sitemap dinámico'
+   485→- 11 archivos creados/modificados en src/ + 1 borrado (public/robots.txt)
+   486→- Push a origin/main exitoso (3153d97..f931f45)
+   487→- Rama crm-feature actualizada en GitHub con CRM intacto
+   488→- Remote URL limpio (sin PAT) después del push
+   489→- Pendiente: testear el deploy en Vercel (auto-deploy debería activarse)
+   490→- Pendiente: 1 commit UUID colado en el historial (solo cambios de permisos, inofensivo)
+   491→
