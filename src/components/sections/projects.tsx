@@ -50,12 +50,12 @@ function Projects() {
       status: "En producción",
     },
     {
-      title: "El Quincho de Florencia",
+      title: "Parrilla La Esquina",
       subtitle: "Restaurant — Demo de portfolio",
       description:
-        "Demo de sitio web para restaurant con sistema de reservas online, menú digital con fotos por plato, botón flotante de WhatsApp para pedidos y sección de reseñas reales de Google. Diseño mobile-first, optimizado para turistas que buscan dónde comer desde el celular.",
+        "Demo de sitio web para parrilla argentina con sistema de reservas online, menú digital con fotos por plato y precios en pesos, botón flotante de WhatsApp para pedidos y sección de reseñas reales de Google. Diseño mobile-first, optimizado para turistas que buscan dónde comer desde el celular.",
       image: "/demo-restaurant.png",
-      url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20restaurant%20y%20quiero%20algo%20parecido",
+      url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20parrilla%20y%20quiero%20algo%20parecido",
       tags: ["Restaurant", "Reservas Online", "Menú Digital", "WhatsApp"],
       tech: ["Next.js", "React", "Tailwind CSS", "Google Maps API"],
       metrics: [
@@ -66,10 +66,10 @@ function Projects() {
       status: "Demo",
     },
     {
-      title: "Estudio Mendez & Asociados",
+      title: "Estudio Fernández & Romero",
       subtitle: "Estudio jurídico — Demo de portfolio",
       description:
-        "Demo de sitio web para estudio jurídico con páginas dedicadas por área de práctica (laboral, civil, penal, comercial), sistema de consultas por WhatsApp con mensaje pre-armado, sección de equipo con matrículas profesionales y blog jurídico con preguntas frecuentes. SEO optimizado para captar búsquedas comerciales.",
+        "Demo de sitio web para estudio jurídico con páginas dedicadas por área de práctica (laboral, civil, penal, comercial, familia, sucesiones), sistema de consultas por WhatsApp con mensaje pre-armado por área, sección de equipo con matrículas profesionales y blog jurídico con preguntas frecuentes. SEO optimizado para captar búsquedas comerciales.",
       image: "/demo-abogados.png",
       url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20estudio%20jurídico%20y%20quiero%20algo%20parecido",
       tags: ["Estudio Jurídico", "Multi-área", "Consultas Online", "SEO Local"],
@@ -82,10 +82,10 @@ function Projects() {
       status: "Demo",
     },
     {
-      title: "Cabañas Los Pinos",
+      title: "Cabañas del Lago",
       subtitle: "Cabañas turísticas — Demo de portfolio",
       description:
-        "Demo de sitio web para cabañas en Valle de Punilla con widget de reservas, galería de fotos de cada cabaña, tarifas dinámicas por temporada, integración con WhatsApp para consultas y sección de actividades turísticas de la zona. Pensado para aparecer en búsquedas tipo \"cabañas en Villa Carlos Paz\".",
+        "Demo de sitio web para complejo de cabañas en Valle de Punilla con widget de reservas, galería de fotos de cada cabaña, tarifas dinámicas por temporada, integración con WhatsApp para consultas y sección de actividades turísticas de la zona. Pensado para aparecer en búsquedas tipo \"cabañas en Villa Carlos Paz\".",
       image: "/demo-cabanas.png",
       url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20cabañas%20y%20quiero%20algo%20parecido",
       tags: ["Turismo", "Cabañas", "Reservas", "Galería"],
