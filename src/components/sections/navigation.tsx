@@ -13,6 +13,7 @@
 // - useTheme: hook de next-themes para cambiar entre claro/oscuro
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -47,12 +48,15 @@ function Navigation() {
   }, []); // Array vacío = ejecutar solo una vez al montar
 
   // Links de navegación - array de objetos
-  const links = [
+  // 'Recursos' es la única ruta que apunta a una página interna (/blog),
+  // las demás son anchors a secciones del home.
+  const links: { label: string; href: string; external?: boolean }[] = [
     { label: "Inicio", href: "#hero" },
     { label: "Sobre mí", href: "#about" },
     { label: "Servicios", href: "#services" },
     { label: "Proyectos", href: "#projects" },
     { label: "Planes", href: "#pricing" },
+    { label: "Recursos", href: "/blog", external: true },
     { label: "FAQ", href: "#faq" },
     { label: "Contacto", href: "#contact" },
   ];
@@ -84,16 +88,26 @@ function Navigation() {
 
         {/* Links desktop - ocultos en mobile (hidden md:flex) */}
         <div className="hidden lg:flex items-center gap-6">
-          {/* .map() recorre el array y crea un <a> por cada link */}
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+          {/* .map() recorre el array y crea un link por cada item */}
+          {links.map((link) =>
+            link.external ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </a>
+            )
+          )}
 
           {/* Toggle de tema (claro/oscuro) */}
           <button
@@ -152,16 +166,27 @@ function Navigation() {
             className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border overflow-hidden"
           >
             <div className="px-6 py-4 flex flex-col gap-4">
-              {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)} // Cierra menú al clickear
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {links.map((link) =>
+                link.external ? (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)} // Cierra menú al clickear
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
 
               {/* Toggle de tema dentro del menú mobile */}
               <button
