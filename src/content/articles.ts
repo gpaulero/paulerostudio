@@ -22,6 +22,7 @@ import article2 from "./articles/whatsapp-business-vs-web-propia";
 import article3 from "./articles/migrar-de-wix-canva-a-web-profesional";
 import article4 from "./articles/precio-pagina-web-comercio-cordoba";
 import article5 from "./articles/wix-no-aparece-en-google";
+import article6 from "./articles/web-para-abogados-estudio-juridico";
 
 export const ARTICLES: Article[] = [
   article1,
@@ -29,6 +30,7 @@ export const ARTICLES: Article[] = [
   article3,
   article4,
   article5,
+  article6,
 ];
 
 // ──────────────────────────────────────────────────────────────
