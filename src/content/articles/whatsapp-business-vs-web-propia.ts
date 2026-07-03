@@ -7,7 +7,7 @@ const article: Article = {
     "No es una elección: son dos herramientas distintas. Te explico qué hace cada una, cuándo alcanza solo con WhatsApp y cuándo tu comercio necesita una web.",
   category: "Comparativas",
   tags: ["whatsapp business", "web propia", "comercios", "presencia online"],
-  publishedAt: "2026-07-03",
+  publishedAt: "2026-06-15",
   readingTime: "5 min",
   coverEmoji: "💬",
   intro:

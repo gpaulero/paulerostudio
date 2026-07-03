@@ -7,7 +7,7 @@ const article: Article = {
     "Cómo se calcula el precio de una web para un comercio en Córdoba: qué factores lo suben, qué factores lo bajan, y por qué los precios publicados suelen engañar.",
   category: "Comercios",
   tags: ["precio web", "córdoba", "comercios", "presupuesto web"],
-  publishedAt: "2026-07-03",
+  publishedAt: "2026-06-22",
   readingTime: "6 min",
   coverEmoji: "💰",
   intro:

@@ -8,7 +8,7 @@ const article: Article = {
     "Guía concreta para dueños de restaurantes en Villa Carlos Paz: qué necesita tu web para captar turistas, reservas y pedidos. Evitá los errores comunes.",
   category: "Comercios",
   tags: ["restaurantes", "villa carlos paz", "reservas online", "menú QR"],
-  publishedAt: "2026-07-03",
+  publishedAt: "2026-06-08",
   readingTime: "6 min",
   coverEmoji: "🍽️",
   intro:

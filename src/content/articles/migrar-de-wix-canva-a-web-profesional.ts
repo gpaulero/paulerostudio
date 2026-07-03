@@ -7,7 +7,7 @@ const article: Article = {
     "Wix y Canva sirven para arrancar, pero en algún momento tu comercio los va a superar. Señales de que es hora de migrar y cómo hacerlo sin perder SEO ni clientes.",
   category: "Guías",
   tags: ["wix", "canva", "migración web", "wordpress", "presencia online"],
-  publishedAt: "2026-07-03",
+  publishedAt: "2026-06-29",
   readingTime: "7 min",
   coverEmoji: "🚚",
   intro:
