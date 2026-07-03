@@ -405,3 +405,86 @@ Stage Summary:
   1. Gonzalo debería recibir los 6 leads en Telegram ya — tocar el link "Abrir WhatsApp con pitch listo" para contactarlos
   2. Para cargar al CRM: Gonzalo puede either (a) pegar los 6 leads manualmente via /admin → "Nuevo comercio", o (b) darme la CRM_API_KEY de Vercel y los subo via API
   3. Pendiente: 113 leads totales (35 Alta prioridad pero sin teléfono válido) quedaron en info_leads_finales.json — se pueden re-procesar después buscando teléfonos manualmente en IG/FB de cada uno
+
+---
+Task ID: 17
+Agent: main (super-z)
+Task: Sacar CRM (a rama), crear blog "Recursos" con 4 artículos SEO, agregar link en nav
+
+Work Log:
+- Aclaré al user la diferencia entre "sacar CRM" (no recomendado) y "dejarlo en rama" (sí)
+- Recomendé blog orientado a SEO local (rubro+zona) en vez de blog genérico
+- User aprobó: "si todo" → procedí con las 4 partes
+
+PARTE 1: CRM a rama
+- Creé rama local 'crm-feature' desde main con todo el código CRM intacto
+- Forcé push de la rama a origin/crm-feature (sobreescribió la rama vieja)
+- En main el CRM sigue funcionando en /admin (no hay link público a /login)
+- No se tocó código del CRM en main
+
+PARTE 2: Stack del blog
+- Decidí TS modules + react-markdown (sin MDX) porque:
+  * react-markdown ya estaba instalado en package.json
+  * Sin pasos de build extra
+  * Mejor mantenibilidad: un archivo .ts por artículo
+- Estructura creada:
+  * src/content/articles-config.ts (tipo Article + helpers)
+  * src/content/articles.ts (índice + helpers)
+  * src/content/articles/<slug>.ts (un archivo por artículo)
+
+PARTE 3: Páginas del blog
+- src/app/blog/page.tsx (índice):
+  * Filtros por categoría (Todos / Comercios / Comparativas / Guías / Casos)
+  * Cards con emoji, título, intro, fecha, tiempo de lectura
+  * CTA grande a WhatsApp al final
+  * Metadata con title + description + openGraph
+- src/app/blog/[slug]/page.tsx (detalle):
+  * generateStaticParams (prerenderiza todos los slugs)
+  * generateMetadata dinámica (title, description, keywords, openGraph, twitter)
+  * JSON-LD BlogPosting schema para SEO
+  * ReactMarkdown con componentes custom (h2, h3, p, ul, ol, li, strong, a, code, blockquote)
+  * CTA al final con mensaje de WhatsApp pre-armado según artículo
+  * Tags al pie
+  * Sección "Seguí leyendo" con artículos relacionados
+- Borré public/robots.txt (estático) y creé src/app/robots.ts (dinámico con sitemap URL + disallow /admin,/login,/api/*)
+- Creé src/app/sitemap.ts con todas las URLs (home + /blog + 4 artículos)
+
+PARTE 4: 4 artículos SEO
+1. web-para-restaurant-villa-carlos-paz (Comercios) — 6 min lectura
+   Optimizado para: "web restaurant Villa Carlos Paz", "reservas online"
+2. whatsapp-business-vs-web-propia (Comparativas) — 5 min
+   Optimizado para: "whatsapp vs web", "necesito web"
+3. migrar-de-wix-canva-a-web-profesional (Guías) — 7 min
+   Optimizado para: "migrar de wix", "salir de canva"
+4. precio-pagina-web-comercio-cordoba (Comercios) — 6 min
+   Optimizado para: "precio web Córdoba", "cuánto cuesta web"
+
+Cada artículo: ~800-1500 palabras, tono honesto/directo sin tecnicismos,
+CTA con mensaje WhatsApp específico al artículo.
+
+PARTE 5: Navegación
+- navigation.tsx: agregué 'Recursos' link entre 'Planes' y 'FAQ'
+  * Tipo del array links ampliado: { label, href, external? }
+  * Renderer condicional: Link de next/link para external=true, <a> para anchors
+  * Mobile menu actualizado igual que desktop
+- footer.tsx: agregué links 'Recursos' (/blog) y 'WhatsApp' en el footer
+
+VERIFICACIÓN (dev server local):
+- GET / → HTTP 200 (home carga OK)
+- GET /blog → HTTP 200 (índice muestra 4 artículos con cards)
+- GET /blog/<cada-slug> → HTTP 200 (los 4 artículos renderizan markdown)
+- GET /sitemap.xml → HTTP 200 (URLs: home, /blog, 4 artículos)
+- GET /robots.txt → HTTP 200 (con disallow /admin,/login,/api/* y sitemap URL)
+- Nav tiene "Recursos" link (verificado en HTML: href="/blog">Recursos)
+- Footer tiene "Recursos" y "WhatsApp" links
+- CTA WhatsApp en cada artículo con mensaje pre-armado (verificado HTML)
+- TypeScript sin errores en código nuevo (npx tsc --noEmit OK para src/)
+
+Stage Summary:
+- Commit f931f45: 'feat: agregar blog/recursos con 4 artículos SEO + sitemap dinámico'
+- 11 archivos creados/modificados en src/ + 1 borrado (public/robots.txt)
+- Push a origin/main exitoso (3153d97..f931f45)
+- Rama crm-feature actualizada en GitHub con CRM intacto
+- Remote URL limpio (sin PAT) después del push
+- Pendiente: testear el deploy en Vercel (auto-deploy debería activarse)
+- Pendiente: 1 commit UUID colado en el historial (solo cambios de permisos, inofensivo)

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Recursos | Paulero Studio",
   description:
-    "Guías, comparativas y casos prácticos para comercios que quieren mejorar su presencia online en Córdoba y Valle de Punilla.",
+    "Guías, comparativas y casos prácticos para comercios que quieren mejorar su presencia online. Sin tecnicismos.",
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Recursos | Paulero Studio",
@@ -101,8 +101,7 @@ export default function BlogPage({
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
             Guías, comparativas y casos prácticos para comercios que quieren
-            mejorar su presencia online en Córdoba y Valle de Punilla. Sin
-            tecnicismos, sin humo.
+            mejorar su presencia online. Sin tecnicismos.
           </p>
         </header>
 
