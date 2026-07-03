@@ -55,7 +55,7 @@ function Projects() {
       description:
         "Demo de sitio web para parrilla argentina con sistema de reservas online, menú digital con fotos por plato y precios en pesos, botón flotante de WhatsApp para pedidos y sección de reseñas reales de Google. Diseño mobile-first, optimizado para turistas que buscan dónde comer desde el celular.",
       image: "/demo-restaurant.png",
-      url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20parrilla%20y%20quiero%20algo%20parecido",
+      url: "/demos/parrilla-la-esquina",
       tags: ["Restaurant", "Reservas Online", "Menú Digital", "WhatsApp"],
       tech: ["Next.js", "React", "Tailwind CSS", "Google Maps API"],
       metrics: [
@@ -71,7 +71,7 @@ function Projects() {
       description:
         "Demo de sitio web para estudio jurídico con páginas dedicadas por área de práctica (laboral, civil, penal, comercial, familia, sucesiones), sistema de consultas por WhatsApp con mensaje pre-armado por área, sección de equipo con matrículas profesionales y blog jurídico con preguntas frecuentes. SEO optimizado para captar búsquedas comerciales.",
       image: "/demo-abogados.png",
-      url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20estudio%20jurídico%20y%20quiero%20algo%20parecido",
+      url: "/demos/estudio-fernandez-romero",
       tags: ["Estudio Jurídico", "Multi-área", "Consultas Online", "SEO Local"],
       tech: ["Next.js", "React", "Tailwind CSS", "Structured Data"],
       metrics: [
@@ -87,7 +87,7 @@ function Projects() {
       description:
         "Demo de sitio web para complejo de cabañas en Valle de Punilla con widget de reservas, galería de fotos de cada cabaña, tarifas dinámicas por temporada, integración con WhatsApp para consultas y sección de actividades turísticas de la zona. Pensado para aparecer en búsquedas tipo \"cabañas en Villa Carlos Paz\".",
       image: "/demo-cabanas.png",
-      url: "https://wa.me/5493517656918?text=Hola%20Gonzalo%2C%20vi%20el%20demo%20de%20cabañas%20y%20quiero%20algo%20parecido",
+      url: "/demos/cabanas-del-lago",
       tags: ["Turismo", "Cabañas", "Reservas", "Galería"],
       tech: ["Next.js", "React", "Tailwind CSS", "Google Maps API"],
       metrics: [
@@ -202,7 +202,7 @@ function Projects() {
                     <div className="flex gap-3">
                       <Button variant="outline" className="rounded-full group/btn" asChild>
                         <a href={project.url} target="_blank" rel="noopener noreferrer">
-                          {project.status === "Demo" ? "Quiero algo similar" : "Ver sitio"}
+                          {project.status === "Demo" ? "Ver demo en vivo" : "Ver sitio"}
                           <ExternalLink className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                         </a>
                       </Button>
