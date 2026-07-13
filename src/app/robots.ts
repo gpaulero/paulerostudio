@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
+const BASE_URL = "https://www.paulerostudio.com";
+
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://paulerostudio.vercel.app";
   return {
     rules: [
       {
@@ -10,6 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/login", "/api/comercios", "/api/auth"],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${BASE_URL}/sitemap.xml`,
+    host: BASE_URL,
   };
 }
