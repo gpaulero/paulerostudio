@@ -3,23 +3,23 @@ import type { Article } from "../articles-config";
 const article: Article = {
   slug: "wix-vs-web-propia",
   title:
-    "Wix vs web propia: comparativa honesta para comercios en 2026",
+    "Wix vs web propia: comparativa real para comercios en 2026",
   description:
-    "¿Wix o una web profesional? Comparativa real sobre SEO, velocidad, costos, dominio y funcionalidades. Qué conviene según tu comercio y cuándo migrar de Wix.",
+    "¿Wix o una web profesional? Comparativa concreta sobre SEO, velocidad, costos, dominio y funcionalidades. Qué conviene según tu comercio y cuándo migrar de Wix.",
   category: "Comparativas",
   tags: ["wix", "web propia", "comparativa", "seo", "comercios", "migración"],
   publishedAt: "2026-07-17",
   readingTime: "9 min",
   coverEmoji: "⚖️",
   intro:
-    "Wix es la opción rápida. Una web propia es la opción profesional. Te muestro, sin vende humo, en qué se diferencian y qué conviene según tu caso.",
-  content: `## La comparativa que nadie te hace honestamente
+    "Wix es la opción rápida. Una web propia es la opción profesional. Te muestro en qué se diferencian y qué conviene según tu caso, sin venderte humo.",
+  content: `## La comparativa que falta en otros lados
 
 Si llegaste a este artículo probablemente tenés una web en Wix (o estás por armar una) y querés saber si vale la pena dar el salto a una web propia. La respuesta corta es: depende. La respuesta larga es este artículo.
 
-Hay mucha información partial por ahí. Por un lado, los que defienden Wix dicen que "es suficiente para cualquier comercio chico". Por otro, los desarrolladores que vivimos de hacer webs propias decimos que "Wix es un daño para tu SEO". Ninguno de los dos es totalmente honesto.
+Hay mucha información parcial por ahí. Por un lado, los que defienden Wix dicen que "es suficiente para cualquier comercio chico". Por otro, los desarrolladores que vivimos de hacer webs propias decimos que "Wix es un daño para tu SEO". Ninguno de los dos cuenta la historia completa.
 
-Acá te voy a mostrar las dos caras: cuándo Wix alcanza, cuándo una web propia es claramente superior, y cómo decidir sin que te vendan humo.
+Acá te muestro las dos caras: cuándo Wix alcanza, cuándo una web propia es claramente superior, y cómo decidir sin que te vendan humo.
 
 Si querés que veamos tu caso concreto, escribinos por WhatsApp sin compromiso.
 
@@ -187,7 +187,7 @@ Esto es soberanía digital. No es un detalle.
 
 ## ¿Cuándo SÍ conviene Wix?
 
-Para ser honestos, hay casos donde Wix tiene sentido:
+Hay casos donde Wix alcanza y no vale la pena gastar más:
 
 ### Caso 1: Recién arrancás y no sabés si tu negocio va a funcionar
 
@@ -244,17 +244,17 @@ Si se hace bien, no perdés ni una visita. Y en las semanas siguientes a la migr
 
 Tenemos una guía completa sobre esto: [Migrar de Wix/Canva a una web profesional](/blog/migrar-de-wix-canva-a-web-profesional).
 
-## Mi recomendación honesta
+## Qué te conviene, en una frase
 
 Si tu comercio es chico, no dependés de Google y no necesitás funcionalidades avanzadas: Wix está bien. No dejes que nadie te venda algo que no necesitás.
 
 Si tu comercio **depende de Google**, **tiene catálogo**, o **necesita funcionalidades custom**: una web propia es la inversión correcta. No es un gasto, es la base de tu presencia digital.
 
-Y si estás en el medio (tenés Wix, te funciona más o menos, pero sentís que te falta algo), el mejor primer paso es una **auditoría gratuita**. Te decimos honestamente: te conviene quedarte en Wix y fixear algunas cosas, o ya es momento de migrar.
+Y si estás en el medio (tenés Wix, te funciona más o menos, pero sentís que te falta algo), el mejor primer paso es una **auditoría gratuita**. Te decimos sin vuelta: te conviene quedarte en Wix y fixear algunas cosas, o ya es momento de migrar.
 
 ## ¿Querés que evaluemos tu caso?
 
-Si tenés una web en Wix y querés saber si vale la pena migrar, escribinos por WhatsApp. Sin compromiso, sin venta agresiva. Te hacemos una evaluación honesta y te decimos:
+Si tenés una web en Wix y querés saber si vale la pena migrar, escribinos por WhatsApp. Sin compromiso, sin venta agresiva. Te hacemos una evaluación y te decimos sin filtro:
 
 - Si tu web de Wix se puede mejorar (y cómo)
 - Si ya es momento de migrar a una web propia
